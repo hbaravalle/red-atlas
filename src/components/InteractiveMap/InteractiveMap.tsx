@@ -8,7 +8,7 @@ const Mapbox = () => {
   const mapRef = useRef<mapboxgl.Map | null>(null);
 
   useEffect(() => {
-    if (!mapContainerRef.current) return; // Verifica que el contenedor exista antes de continuar
+    if (!mapContainerRef.current) return;
 
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -18,7 +18,6 @@ const Mapbox = () => {
       zoom: 8,
     });
 
-    // Agregar marcadores
     new mapboxgl.Marker()
       .setLngLat([-66.492857, 18.449804])
       .addTo(mapRef.current);
@@ -39,7 +38,7 @@ const Mapbox = () => {
       style={{ height: '100vh', width: '100vw' }}
       ref={mapContainerRef}
       className='map-container'
-    />
+    ></div>
   );
 };
 
