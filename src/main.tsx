@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { store } from './redux/store';
 import App from './App';
 import ModalDetail from './components/ModalDetail';
+import ModalCreate from './components/ModalCreate';
 import './index.scss';
 
 createRoot(document.getElementById('root')!).render(
@@ -14,6 +15,7 @@ createRoot(document.getElementById('root')!).render(
         <Routes>
           <Route path='/' element={<App />}>
             <Route path='/detail' element={<ModalDetail />} />
+            <Route path='/create' element={<ModalCreate />} />
           </Route>
         </Routes>
       </BrowserRouter>
