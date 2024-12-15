@@ -1,4 +1,4 @@
-import './ModelCreate.scss';
+import './ModalCreate.scss';
 
 export default function ModalCreate() {
   return (
