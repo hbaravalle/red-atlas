@@ -33,7 +33,7 @@ header {
       background-color: #fff;
       position: absolute;
       right: 0;
-      top: 60px;
+      top: 50px;
 
       .result {
         display: flex;
@@ -70,14 +70,15 @@ header {
           }
 
           .pills {
+            display: flex;
+            gap: 3px;
             position: relative;
-
             bottom: 0;
 
             & > * {
               display: inline-block;
               font-size: 0.75rem;
-              padding: 2px 6px;
+              padding: 2px 6px 3px;
               color: #fff;
               border-radius: 50px;
               font-weight: bold;
@@ -87,7 +88,7 @@ header {
 
           .numbers {
             display: flex;
-            gap: 20px;
+            gap: 2rem;
           }
         }
       }
