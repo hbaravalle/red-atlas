@@ -25,6 +25,7 @@ header {
     margin: 20px;
     padding: 10px;
     border-radius: 6px;
+    z-index: 3000;
 
     .search {
       width: 100%;
@@ -39,7 +40,7 @@ header {
         display: flex;
         gap: 10px;
 
-        input[name='search'] {
+        input[name='query'] {
           width: 100%;
           border: none;
           padding: 5px;
@@ -49,17 +50,22 @@ header {
 
     .search-results {
       width: 100%;
+      max-height: 400px;
       border-radius: 6px;
       background-color: #fff;
       position: absolute;
       left: 0;
       top: 65px;
+      overflow-y: scroll;
+      overflow-x: hidden;
 
       .result {
         display: flex;
         gap: 10px;
         padding: 10px;
         font-size: 0.8rem;
+        text-decoration: none;
+        color: inherit;
 
         &:not(.result:last-child) {
           border-bottom: 1px solid #eaeaea;

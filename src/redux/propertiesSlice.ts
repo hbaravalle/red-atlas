@@ -3,10 +3,14 @@ import { Property } from '../types/property';
 
 interface PropertiesState {
   list: Property[];
+  searchResults: Property[];
+  sort: string;
 }
 
 const initialState: PropertiesState = {
   list: [],
+  searchResults: [],
+  sort: 'date',
 };
 
 export const fetchProperties = createAsyncThunk(
@@ -33,6 +37,12 @@ const propertiesSlice = createSlice({
     addProperty: (state, action: PayloadAction<Property>) => {
       state.list.push(action.payload);
     },
+    setSearchResults: (state, action: PayloadAction<Property[]>) => {
+      state.searchResults = action.payload;
+    },
+    setSort: (state, action: PayloadAction<string>) => {
+      state.sort = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchProperties.fulfilled, (state, action) => {
@@ -41,5 +51,6 @@ const propertiesSlice = createSlice({
   },
 });
 
-export const { setProperties, addProperty } = propertiesSlice.actions;
+export const { setProperties, addProperty, setSearchResults, setSort } =
+  propertiesSlice.actions;
 export default propertiesSlice.reducer;

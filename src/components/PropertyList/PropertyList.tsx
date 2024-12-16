@@ -5,6 +5,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Property } from '../../types/property';
 import { setProperties } from '../../redux/propertiesSlice';
+import defaultImage from '../../assets/property-default.jpg';
 import './PropertyList.scss';
 
 export default function PropertyList() {
@@ -83,7 +84,7 @@ export default function PropertyList() {
                 key={property._id}
               >
                 <figure>
-                  <img src={property.images[0]} alt='' />
+                  <img src={property.images[0] || defaultImage} alt='' />
                   <div className='pills'>
                     <span className='status'>
                       {property.status === 'sale' ? 'Venta' : 'Alquiler'}
