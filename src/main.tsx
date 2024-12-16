@@ -14,7 +14,7 @@ createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<App />}>
-            <Route path='/detail' element={<ModalDetail />} />
+            <Route path='/detail/:id' element={<ModalDetail />} />
             <Route path='/create' element={<ModalCreate />} />
           </Route>
         </Routes>

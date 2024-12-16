@@ -1,17 +1,39 @@
-import { Link } from 'react-router';
+import { useEffect } from 'react';
+import { NavLink } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
+import { formatDistanceToNow } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { setProperties } from '../../redux/propertiesSlice';
+import { Property } from '../../types/property';
 import './PropertyList.scss';
 
 export default function PropertyList() {
+  const dispatch = useDispatch();
+  const properties = useSelector(
+    (state: { properties: { list: Property[] } }) => state.properties.list
+  );
+
+  useEffect(() => {
+    const getProperties = async () => {
+      const response = await fetch(
+        'https://fake-api-listings.vercel.app/properties'
+      );
+      const data = await response.json();
+      dispatch(setProperties(data));
+    };
+
+    getProperties();
+  }, []);
+
   return (
     <div id='propertyList'>
       <div className='container'>
         <div className='header'>
           <h1>Propiedades</h1>
           <form>
+            Filtrar por{' '}
             <select name='' id=''>
-              <option value='' hidden>
-                Filtrar por
-              </option>
+              <option value='' hidden></option>
               <option value=''>Item 1</option>
               <option value=''>Item 1</option>
               <option value=''>Item 1</option>
@@ -21,37 +43,41 @@ export default function PropertyList() {
           </form>
         </div>
         <div className='cards'>
-          <Link to='/detail'>
-            <div className='card'>
+          {properties.map((property: Property) => (
+            <NavLink
+              className='card'
+              to={`/detail/${property.id}`}
+              key={property.id}
+            >
               <figure>
-                <img
-                  className=''
-                  src='https://images.unsplash.com/photo-1733235014433-00116a9ec23d?q=80&w=1287&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-                  alt=''
-                />
+                <img className='' src={property.images[0]} alt='' />
                 <div className='pills'>
-                  <span className='status'>En Venta</span>{' '}
-                  {/* En venta, en alquiler */}
-                  <span className='type'>Tipo 2</span> {/* Tipo de propiedad */}
-                  <span className='isActive'>Activo</span>{' '}
-                  {/* Activo, inactivo */}
+                  <span className='status'>
+                    {property.status === 'sale' ? 'Venta' : 'Alquiler'}
+                  </span>{' '}
+                  <span className='type'>{property.type}</span>
+                  <span className='isActive'>
+                    {property.isActive ? 'Activo' : 'Inactivo'}
+                  </span>
                 </div>
               </figure>
               <div className='details'>
-                <p className='title'>
-                  Compello velit vociferor hic allatus arcus
-                </p>
-                <p className='address'>99016 Jacobi Ferry Suite 104</p>
-
+                <p className='title'>{property.title}</p>
+                <p className='address'>{property.address}</p>
                 <div className='numbers'>
-                  <p className='price'>$376789</p>
-                  <p className='area'>948 pie²</p>
+                  <p className='price'>${property.price}</p>
+                  <p className='area'>{property.area} pie²</p>
                 </div>
-
-                <p className='createdAt'>Publicado hace 2 días</p>
+                <p className='createdAt'>
+                  Publicada{' '}
+                  {formatDistanceToNow(new Date(property.createdAt), {
+                    addSuffix: true,
+                    locale: es,
+                  })}
+                </p>
               </div>
-            </div>
-          </Link>
+            </NavLink>
+          ))}
         </div>
       </div>
     </div>
