@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router';
 import { Search } from 'react-feather';
-import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { Property } from '../../types/property';
 import defaultImage from '../../assets/property-default.jpg';
@@ -12,11 +11,7 @@ interface SearchFormValues {
 }
 
 export default function Nav() {
-  const {
-    register,
-    watch,
-    formState: { errors },
-  } = useForm<SearchFormValues>();
+  const { register, watch } = useForm<SearchFormValues>();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
 
