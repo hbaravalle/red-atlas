@@ -1,50 +1,49 @@
-# React + TypeScript + Vite
+# Front-End Challenge - Mid-Level 🚀
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Prerrequisitos
 
-Currently, two official plugins are available:
+Tener instalados Node y NPM:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- [Node.js](https://nodejs.org/es/download/)
+- [npm](https://www.npmjs.com/get-npm) (Node Package Manager)
 
-## Expanding the ESLint configuration
+## Funcionalidades de la Aplicación
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- [x] Mostrar una lista de propiedades
+- [x] Vista de detalle de las propiedades
+- [x] Mapa interactivo
 
-- Configure the top-level `parserOptions` property like this:
+## Instrucciones para instalar y ejecutar la aplicación
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 1. Clonar el repositorio
+
+```bash
+git clone --branch hernan-baravalle https://github.com/hbaravalle/mid-frontend-challenge
+cd frontend-haciendola-challenge
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### 2. Instalar dependencias
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+Habiendo navegado hacia el directorio del proyecto, ejecutar:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+npm install
 ```
+
+### 3. Iniciar la aplicación
+
+Ejecuta el siguiente comando para iniciar la aplicación en modo de desarrollo:
+
+```bash
+npm run dev
+```
+
+## Funcionalidades en desarrollo
+
+- [ ] Formulario de creación/edición
+- [ ] Filtro de propiedades
+- [ ] Paginación
+
+---
+
+¡Gracias por la oportunidad!
