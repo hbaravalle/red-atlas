@@ -70,10 +70,11 @@ export default function PropertyList() {
                 </div>
                 <p className='createdAt'>
                   Publicada{' '}
-                  {formatDistanceToNow(new Date(property.createdAt), {
-                    addSuffix: true,
-                    locale: es,
-                  })}
+                  {property.createdAt &&
+                    formatDistanceToNow(new Date(property.createdAt), {
+                      addSuffix: true,
+                      locale: es,
+                    })}
                 </p>
               </div>
             </NavLink>

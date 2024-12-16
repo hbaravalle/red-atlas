@@ -48,11 +48,11 @@ export default function ModalDetail() {
             <p className='area'>{data.area} pie²</p>
 
             <p className='createdAt'>
-              Publicada{' '}
-              {formatDistanceToNow(new Date(data.createdAt), {
-                addSuffix: true,
-                locale: es,
-              })}
+              {data.createdAt &&
+                formatDistanceToNow(new Date(data.createdAt), {
+                  addSuffix: true,
+                  locale: es,
+                })}
             </p>
             <p>Contacto: John Doe - johndoe@example.com</p>
           </>
