@@ -17,7 +17,7 @@ export default function Nav() {
           </form>
         </div>
         <div className='search-results'>
-          <Link>
+          <Link to='/detail/f2718c54-c978-4dfa-8bbf-189371860c1c'>
             <div className='result'>
               <img src={PropertyImageDefault} alt='' />
               <div className='info'>
