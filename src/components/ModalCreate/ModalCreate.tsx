@@ -1,6 +1,9 @@
 import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
+import { fetchProperties } from '../../redux/propertiesSlice';
+import { AppDispatch } from '../../redux/store';
 import './ModalCreate.scss';
 
 interface FormValues {
@@ -8,15 +11,21 @@ interface FormValues {
   address: string;
   price: number;
   description: string;
-  image: string;
+  image: string[];
   type: string;
   status: string;
   area: string;
   ownerName: string;
   contact: string;
+  isActive: boolean;
+  location: {
+    lat: string;
+    lng: string;
+  };
 }
 
 export default function ModalCreate() {
+  const dispatch = useDispatch<AppDispatch>();
   const {
     register,
     handleSubmit,
@@ -36,7 +45,7 @@ export default function ModalCreate() {
     console.log('Datos de la nueva propiedad:', data);
     try {
       const response = await fetch(
-        'https://fake-api-listings.vercel.app/properties',
+        'https://api-red-atlas-livid.vercel.app/api/properties',
         {
           method: 'POST',
           headers: {
@@ -48,6 +57,7 @@ export default function ModalCreate() {
 
       if (response.ok) {
         toast.success('Propiedad creada exitosamente');
+        dispatch(fetchProperties());
         handleClose();
       } else {
         toast.error('Error al crear la propiedad');
@@ -110,14 +120,42 @@ export default function ModalCreate() {
             )}
           </div>
 
+          <div style={{ display: 'flex', gap: 20 }}>
+            <div className='form-group'>
+              <label htmlFor='latitude'>Latitud</label>
+              <input
+                id='latitude'
+                type='number'
+                step='any' // Permite números decimales
+                {...register('location.lat', {})}
+              />
+            </div>
+
+            <div className='form-group'>
+              <label htmlFor='longitude'>Longitud</label>
+              <input
+                id='longitude'
+                type='number'
+                step='any' // Permite números decimales
+                {...register('location.lng', {})}
+              />
+            </div>
+          </div>
+
           <div className='form-group'>
             <label htmlFor='image'>Link de la imagen</label>
-            <input id='image' type='text' />
+            <input
+              id='image'
+              type='text'
+              {...register('image', {
+                setValueAs: (value: string) => (value ? [value] : []), // Convierte el valor en un array si no está vacío
+              })}
+            />
           </div>
 
           <div className='form-group'>
             <label htmlFor='area'>Área</label>
-            <input id='area' type='text' />
+            <input id='area' type='text' {...register('area')} />
           </div>
 
           {/* Tipo de propiedad con Radio buttons */}
