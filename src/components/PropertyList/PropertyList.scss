@@ -12,28 +12,30 @@
     position: relative;
 
     .header {
-      width: 45dvw;
+      width: 100%;
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
       padding: 15px 20px 15px;
       border-bottom: 1px solid #dadada;
+      background-color: #fff;
+
+      h1 {
+        width: 100%;
+        font-size: 16px;
+      }
 
       form {
         display: flex;
-        gap: 10px;
+        gap: 5px;
         align-items: center;
+        font-size: 14px;
 
         select {
-          padding: 3px;
-        }
-
-        button[type='button'] {
-          background-color: red;
-          color: #fff;
-          border: none;
-          border-radius: 3px;
-          padding: 5px 10px;
+          option {
+            font-size: inherit;
+          }
         }
       }
     }
@@ -44,6 +46,7 @@
       grid-template-columns: 1fr 1fr;
       gap: 20px;
       padding: 20px;
+      background-color: #fff;
       overflow-y: scroll;
 
       a.card {
@@ -64,6 +67,8 @@
           }
 
           .pills {
+            display: flex;
+            gap: 5px;
             position: absolute;
             bottom: 0;
             padding: 15px 10px;
@@ -106,5 +111,51 @@
         }
       }
     }
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #fff;
+    border-top: 1px solid #dadada;
+
+    .pagination {
+      display: flex;
+      gap: 10px;
+
+      button {
+        padding: 5px 10px;
+      }
+    }
+
+    .create {
+      display: inline-block;
+      text-align: center;
+      background-color: red;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      padding: 5px 10px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+  }
+}
+
+@media (max-width: 1200px) {
+  #propertyList {
+    .container {
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  #propertyList {
+    width: calc(100dvw - 40px);
   }
 }

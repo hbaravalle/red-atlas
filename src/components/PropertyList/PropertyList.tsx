@@ -1,29 +1,30 @@
-import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router';
-import { useDispatch, useSelector } from 'react-redux';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { setProperties } from '../../redux/propertiesSlice';
 import { Property } from '../../types/property';
+import { useState } from 'react';
 import './PropertyList.scss';
 
 export default function PropertyList() {
-  const dispatch = useDispatch();
   const properties = useSelector(
     (state: { properties: { list: Property[] } }) => state.properties.list
   );
+  const [sortedBy, setSortedBy] = useState('date');
 
-  useEffect(() => {
-    const getProperties = async () => {
-      const response = await fetch(
-        'https://fake-api-listings.vercel.app/properties'
-      );
-      const data = await response.json();
-      dispatch(setProperties(data));
-    };
+  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortedBy(event?.target.value);
+  };
 
-    getProperties();
-  }, []);
+  console.log(properties);
+
+  const sortedProperties = [...properties].sort((a, b) => {
+    if (sortedBy === 'date')
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    if (sortedBy === 'priceAsc') return a.price - b.price; // Menor a mayor
+    if (sortedBy === 'priceDesc') return b.price - a.price; // Mayor a menor
+    return 0;
+  });
 
   return (
     <div id='propertyList'>
@@ -31,19 +32,16 @@ export default function PropertyList() {
         <div className='header'>
           <h1>Propiedades</h1>
           <form>
-            Filtrar por{' '}
-            <select name='' id=''>
-              <option value='' hidden></option>
-              <option value=''>Item 1</option>
-              <option value=''>Item 1</option>
-              <option value=''>Item 1</option>
-              <option value=''>Item 1</option>
+            Filtrar por
+            <select name='filter' id='filter' onChange={handleSortChange}>
+              <option value='date'>Fecha de publicación</option>
+              <option value='priceDesc'>Precio, de menor a mayor</option>
+              <option value='priceAsc'>Precio, de mayor a menor</option>
             </select>
-            <button type='button'>+&nbsp;Crear</button>
           </form>
         </div>
         <div className='cards'>
-          {properties.map((property: Property) => (
+          {sortedProperties.map((property: Property) => (
             <NavLink
               className='card'
               to={`/detail/${property.id}`}
@@ -55,7 +53,9 @@ export default function PropertyList() {
                   <span className='status'>
                     {property.status === 'sale' ? 'Venta' : 'Alquiler'}
                   </span>{' '}
-                  <span className='type'>{property.type}</span>
+                  <span className='type'>
+                    {property.type === 'apartment' ? 'Apartamento' : 'Casa'}
+                  </span>
                   <span className='isActive'>
                     {property.isActive ? 'Activo' : 'Inactivo'}
                   </span>
@@ -80,6 +80,15 @@ export default function PropertyList() {
             </NavLink>
           ))}
         </div>
+      </div>
+      <div className='actions'>
+        <div className='pagination'>
+          <button>Anterior</button>
+          <button>Siguiente</button>
+        </div>
+        <NavLink to='/create' className='create'>
+          + Crear
+        </NavLink>
       </div>
     </div>
   );

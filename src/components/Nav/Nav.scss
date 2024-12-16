@@ -1,11 +1,23 @@
 header {
+  display: flex;
+  align-items: center;
   position: relative;
 
+  .logo {
+    display: inline-block;
+    height: 30px;
+
+    img {
+      height: 100%;
+      aspect-ratio: 1 / 1;
+    }
+  }
+
   nav {
-    width: 45vw;
+    width: 50vw;
     display: flex;
     justify-content: space-between;
-    gap: 20px;
+    gap: 10px;
     position: fixed;
     top: 0;
     left: 0;
@@ -15,25 +27,33 @@ header {
     border-radius: 6px;
 
     .search {
-      width: 70%;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      margin-right: 5px;
+      border-left: 1px solid #eaeaea;
+      padding-left: 10px;
 
       form {
+        width: 100%;
         display: flex;
-        gap: 20px;
+        gap: 10px;
 
         input[name='search'] {
           width: 100%;
+          border: none;
+          padding: 5px;
         }
       }
     }
 
     .search-results {
-      width: 70%;
+      width: 100%;
       border-radius: 6px;
       background-color: #fff;
       position: absolute;
-      right: 0;
-      top: 50px;
+      left: 0;
+      top: 65px;
 
       .result {
         display: flex;

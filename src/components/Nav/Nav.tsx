@@ -1,4 +1,5 @@
-import { Link } from 'react-router';
+import { Link, NavLink } from 'react-router';
+import { Search } from 'react-feather';
 import PropertyImageDefault from '../../assets/property-default.jpg';
 import './Nav.scss';
 
@@ -6,14 +7,19 @@ export default function Nav() {
   return (
     <header>
       <nav>
-        <a href=''>
-          Logo
-          {/* <img src='' alt='' /> */}
-        </a>
+        <NavLink to='/' className='logo'>
+          <img src='./logo.svg' alt='Logo Red Atlas' />
+        </NavLink>
         <div className='search'>
           <form action=''>
-            Search
-            <input type='text' name='search' id='search' autoComplete='off' />
+            <Search />
+            <input
+              type='text'
+              name='search'
+              id='search'
+              autoComplete='off'
+              placeholder='Buscar propiedades por titulo o dirección'
+            />
           </form>
         </div>
         <div className='search-results'>

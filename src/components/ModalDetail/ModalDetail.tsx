@@ -1,10 +1,7 @@
-// import { useSelector, useDispatch } from 'react-redux';
-// import { ModalState } from '../../types/modal';
-
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { useSelector } from 'react-redux';
-import { NavLink } from 'react-router';
+import { useNavigate, NavLink } from 'react-router';
 import { Property } from '../../types/property';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -13,7 +10,7 @@ import './ModalDetail.scss';
 export default function ModalDetail() {
   const [data, setData] = useState<Property | null>(null);
   const params = useParams();
-  console.log(params);
+  const navigate = useNavigate();
 
   const properties = useSelector(
     (state: { properties: { list: Property[] } }) => state.properties.list
@@ -23,12 +20,20 @@ export default function ModalDetail() {
     console.log(properties);
     const property = properties.find((element) => element.id === params.id);
     if (property) setData(property);
-  }, []);
+  }, [properties, params.id]);
+
+  const handleClose = () => {
+    navigate('/');
+  };
+
+  const handleModalClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Detiene la propagación del clic al overlay
+  };
 
   return (
-    <div className='overlay'>
+    <div className='modal-detail' onClick={handleClose}>
       <NavLink to='/' className='back'></NavLink>
-      <div className='modal-wrapper'>
+      <div className='modal-wrapper' onClick={handleModalClick}>
         {!data ? (
           <p>Cargando...</p>
         ) : (

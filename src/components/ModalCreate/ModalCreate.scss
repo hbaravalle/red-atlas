@@ -1,4 +1,4 @@
-.overlay {
+.modal-create {
   width: 100dvw;
   height: 100dvh;
   display: flex;
@@ -10,34 +10,84 @@
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 2000;
 
-  .back::before {
-    content: '';
-    width: 50px;
-    height: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    top: calc(65dvh / 2 / 2 - 60px);
-    left: 17.5dvw;
-    background-image: url('./arrow-left.svg');
-    background-color: #fff;
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: 70%;
-    color: #000;
-    font-size: 2rem;
-    border-radius: 100px;
-    cursor: pointer;
-  }
-
   .modal-wrapper {
     width: 65dvw;
-    height: 65dvh;
+    height: auto;
     position: relative;
     padding: 2rem;
     background-color: #fff;
     border-radius: 6px;
     overflow: hidden;
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    form {
+      .form-group {
+        margin-bottom: 12px;
+
+        .radiobtn-group {
+          display: flex;
+          gap: 10px;
+          padding: 10px 0;
+
+          label {
+            padding: 10px 15px;
+            border: 1px solid #b2b2b2;
+            border-radius: 6px;
+            cursor: pointer;
+          }
+
+          input[type='radio'] {
+            margin-right: 10px;
+          }
+        }
+
+        & > label {
+          width: 100%;
+          display: inline-block;
+          margin-bottom: 5px;
+        }
+        & > input,
+        & > textarea {
+          width: 100%;
+          border-radius: 6px;
+          font-size: 16px;
+          padding: 12px;
+          border: 1px solid #636363;
+        }
+
+        .error {
+          display: inline-block;
+          margin-top: 5px;
+          font-size: 14px;
+          color: red;
+        }
+      }
+
+      .actions {
+        display: flex;
+        margin-top: 2rem;
+        gap: 10px;
+
+        button {
+          padding: 5px 10px;
+          border-radius: 6px;
+          cursor: pointer;
+
+          &[type='submit'] {
+            background-color: red;
+            color: #fff;
+            border: none;
+          }
+
+          &.cancel {
+            background-color: transparent;
+            border: 1px solid #636363;
+          }
+        }
+      }
+    }
   }
 }
