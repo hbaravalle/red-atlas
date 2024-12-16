@@ -1,11 +1,17 @@
 import { useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import mapboxgl from 'mapbox-gl';
+import { Property } from '../../types/property';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 const Mapbox = () => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+
+  const properties = useSelector(
+    (state: { properties: { list: Property[] } }) => state.properties.list
+  );
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -18,15 +24,14 @@ const Mapbox = () => {
       zoom: 8,
     });
 
-    new mapboxgl.Marker()
-      .setLngLat([-66.492857, 18.449804])
-      .addTo(mapRef.current);
-    new mapboxgl.Marker()
-      .setLngLat([-65.255856, 18.231558])
-      .addTo(mapRef.current);
-    new mapboxgl.Marker()
-      .setLngLat([-66.77331, 17.971569])
-      .addTo(mapRef.current);
+    for (const property of properties) {
+      new mapboxgl.Marker()
+        .setLngLat([
+          Number(property.location.lng),
+          Number(property.location.lat),
+        ])
+        .addTo(mapRef.current);
+    }
 
     // return () => {
     //   mapRef.current?.remove();

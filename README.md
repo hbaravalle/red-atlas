@@ -30,7 +30,14 @@ Habiendo navegado hacia el directorio del proyecto, ejecutar:
 npm install
 ```
 
-### 3. Iniciar la aplicación
+### 3. Variables de entorno
+
+A partir del archivo `.env.example`, crear un nuevo archivo que contenga la siguiente variable de entorno y su valor correspondiente:
+```bash
+VITE_MAPBOX_TOKEN=
+```
+
+### 4. Iniciar la aplicación
 
 Ejecuta el siguiente comando para iniciar la aplicación en modo de desarrollo:
 

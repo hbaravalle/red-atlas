@@ -15,8 +15,6 @@ export default function ModalDetail() {
   const params = useParams();
   console.log(params);
 
-  if (!params.id) return;
-
   const properties = useSelector(
     (state: { properties: { list: Property[] } }) => state.properties.list
   );
