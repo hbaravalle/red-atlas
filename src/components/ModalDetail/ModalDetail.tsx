@@ -2,7 +2,7 @@
 // import { ModalState } from '../../types/modal';
 
 import { useState, useEffect } from 'react';
-import { useParams, useLocation } from 'react-router';
+import { useParams } from 'react-router';
 import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router';
 import { Property } from '../../types/property';
