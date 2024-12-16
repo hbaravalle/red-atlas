@@ -121,3 +121,11 @@ header {
     }
   }
 }
+
+@media (max-width: 1024px) {
+  header {
+    nav {
+      width: calc(100dvw - 40px);
+    }
+  }
+}
