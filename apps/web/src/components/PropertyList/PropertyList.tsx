@@ -3,10 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Property } from '../../types/property';
+import { DEFAULT_PAGE_SIZE, type Property } from '@red-atlas/shared';
 import { setProperties } from '../../redux/propertiesSlice';
 import defaultImage from '../../assets/property-default.jpg';
 import './PropertyList.scss';
+import { API_URL } from '../../lib/api';
+import { PROPERTY_STATUS_LABELS, PROPERTY_TYPE_LABELS } from '../../lib/labels';
 
 export default function PropertyList() {
   const dispatch = useDispatch();
@@ -23,7 +25,7 @@ export default function PropertyList() {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://api-red-atlas-livid.vercel.app/api/properties?page=${page}&limit=10${
+        `${API_URL}/properties?page=${page}&limit=${DEFAULT_PAGE_SIZE}${
           sortedBy !== 'date' ? '&sort=' + sortedBy : ''
         }`
       );
@@ -87,10 +89,10 @@ export default function PropertyList() {
                   <img src={property.images[0] || defaultImage} alt='' />
                   <div className='pills'>
                     <span className='status'>
-                      {property.status === 'sale' ? 'Venta' : 'Alquiler'}
+                      {PROPERTY_STATUS_LABELS[property.status]}
                     </span>
                     <span className='type'>
-                      {property.type === 'apartment' ? 'Apartamento' : 'Casa'}
+                      {PROPERTY_TYPE_LABELS[property.type]}
                     </span>
                     <span className='isActive'>
                       {property.isActive ? 'Activo' : 'Inactivo'}

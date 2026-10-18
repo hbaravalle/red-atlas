@@ -1,8 +1,9 @@
+import { DEFAULT_PAGE_SIZE } from '@red-atlas/shared';
 import Property from '../models/Property.js';
 
 async function getAll(req, res) {
   try {
-    const { sort, page = 1, limit = 10 } = req.query;
+    const { sort, page = 1, limit = DEFAULT_PAGE_SIZE } = req.query;
 
     const pageNumber = parseInt(page, 10);
     const limitNumber = parseInt(limit, 10);
@@ -49,7 +50,7 @@ async function getById(req, res) {
 
 async function search(req, res) {
   try {
-    const { query, sort, page = 1, limit = 10 } = req.query;
+    const { query, sort, page = 1, limit = DEFAULT_PAGE_SIZE } = req.query;
 
     if (!query || query.trim().length === 0) {
       return res.status(400).json({ message: 'Query string is required' });

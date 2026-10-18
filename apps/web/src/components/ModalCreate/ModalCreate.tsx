@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { fetchProperties } from '../../redux/propertiesSlice';
 import { AppDispatch } from '../../redux/store';
 import './ModalCreate.scss';
+import { API_URL } from '../../lib/api';
 
 interface FormValues {
   title: string;
@@ -45,7 +46,7 @@ export default function ModalCreate() {
     console.log('Datos de la nueva propiedad:', data);
     try {
       const response = await fetch(
-        'https://api-red-atlas-livid.vercel.app/api/properties',
+        `${API_URL}/properties`,
         {
           method: 'POST',
           headers: {
@@ -62,7 +63,7 @@ export default function ModalCreate() {
       } else {
         toast.error('Error al crear la propiedad');
       }
-    } catch (error) {
+    } catch {
       toast.error('Error al crear la propiedad');
     }
   };

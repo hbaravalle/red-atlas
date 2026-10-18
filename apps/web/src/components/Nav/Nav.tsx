@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router';
 import { Search } from 'react-feather';
 import { useForm } from 'react-hook-form';
-import { Property } from '../../types/property';
+import type { Property } from '@red-atlas/shared';
 import defaultImage from '../../assets/property-default.jpg';
 import './Nav.scss';
+import { API_URL } from '../../lib/api';
+import { PROPERTY_STATUS_LABELS, PROPERTY_TYPE_LABELS } from '../../lib/labels';
 
 interface SearchFormValues {
   query: string;
@@ -26,7 +28,7 @@ export default function Nav() {
       const fetchSearchResults = async () => {
         try {
           const response = await fetch(
-            `https://api-red-atlas-livid.vercel.app/api/properties/search?query=${query}`
+            `${API_URL}/properties/search?query=${query}`
           );
           const result = await response.json();
           setResults(result.properties || []);
@@ -71,10 +73,10 @@ export default function Nav() {
                   <p className='title'>{property.title}</p>
                   <div className='pills'>
                     <span className='status'>
-                      {property.status === 'sale' ? 'Venta' : 'Alquiler'}
+                      {PROPERTY_STATUS_LABELS[property.status]}
                     </span>
                     <span className='type'>
-                      {property.type === 'apartment' ? 'Apartamento' : 'Casa'}
+                      {PROPERTY_TYPE_LABELS[property.type]}
                     </span>
                     <span className='isActive'>
                       {property.isActive ? 'Activo' : 'Inactivo'}

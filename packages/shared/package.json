@@ -1,0 +1,15 @@
+{
+  "name": "@red-atlas/shared",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Property domain values and types shared by the Red Atlas web app and API.",
+  "type": "module",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
+  }
+}

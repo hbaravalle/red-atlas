@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { useNavigate, NavLink } from 'react-router';
-import { Property } from '../../types/property';
+import type { Property } from '@red-atlas/shared';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import './ModalDetail.scss';
 import { useSelector } from 'react-redux';
+import { API_URL } from '../../lib/api';
 
 export default function ModalDetail() {
   const [data, setData] = useState<Property | null>(null);
@@ -19,7 +20,7 @@ export default function ModalDetail() {
   const fetchPropertyData = async () => {
     try {
       const response = await fetch(
-        `https://api-red-atlas-livid.vercel.app/api/properties/${params.id}`
+        `${API_URL}/properties/${params.id}`
       );
       if (!response.ok) {
         throw new Error('Error al cargar la propiedad');

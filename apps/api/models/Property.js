@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { PROPERTY_STATUSES, PROPERTY_TYPES } from '@red-atlas/shared';
 
 const propertySchema = new mongoose.Schema(
   {
@@ -28,12 +29,12 @@ const propertySchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['apartment', 'house', 'office', 'land'],
+      enum: PROPERTY_TYPES,
       required: true,
     },
     status: {
       type: String,
-      enum: ['sale', 'rent'],
+      enum: PROPERTY_STATUSES,
       required: true,
     },
     isActive: {

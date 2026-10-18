@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import mapboxgl from 'mapbox-gl';
-import { Property } from '../../types/property';
+import type { Property } from '@red-atlas/shared';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 

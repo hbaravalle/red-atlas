@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Property } from '../types/property';
+import type { Property } from '@red-atlas/shared';
+import { API_URL } from '../lib/api';
 
 interface PropertiesState {
   list: Property[];
@@ -17,7 +18,7 @@ export const fetchProperties = createAsyncThunk(
   'properties/fetchProperties',
   async () => {
     const response = await fetch(
-      'https://api-red-atlas-livid.vercel.app/api/properties'
+      `${API_URL}/properties`
     );
     if (!response.ok) {
       throw new Error('Error al obtener las propiedades');

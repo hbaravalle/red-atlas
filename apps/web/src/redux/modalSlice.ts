@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ModalType, ModalState } from '../types/modal';
-import { Property } from '../types/property';
+import type { Property } from '@red-atlas/shared';
 
 const initialState: ModalState = {
   activeModal: null,
