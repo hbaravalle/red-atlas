@@ -148,8 +148,10 @@ Both apps deploy to Vercel as two projects from this repository:
 
 | Project | Root directory | Notes |
 |---|---|---|
-| Web | `apps/web` | Framework preset: Vite. No env vars required |
-| API | `apps/api` | Uses `apps/api/vercel.json`. Env: `DATABASE_URL` (Neon `main` branch) |
+| Web | `apps/web` | Framework preset: Vite. `vercel.json` sends every route to `index.html`, so `/detail/:id` works on reload. Env: `VITE_API_URL` |
+| API | `apps/api` | Framework preset: Express, no config file: Vercel runs the app `server.js` exports as a function. Env: `DATABASE_URL` (Neon `main` branch) |
+
+Vercel installs from the workspace root, so both apps resolve `@red-atlas/shared`. Pushes to `main` deploy to production; any other branch gets a preview URL.
 
 Migrations are not run on deploy. Before shipping a schema change, run `pnpm migrate` with `DATABASE_URL` pointing at the production branch.
 

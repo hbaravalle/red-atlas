@@ -24,8 +24,7 @@ pnpm seed      # load the 10,000 sample properties
 ├── routes/            # Express router
 ├── seeders/           # 10,000-property dataset + batched seeding script
 ├── drizzle.config.js  # drizzle-kit settings
-├── server.js          # Entry point
-└── vercel.json        # Serverless deployment config
+└── server.js          # Entry point: exports the app for Vercel, listens locally
 ```
 
 ## Changing the schema

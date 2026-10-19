@@ -54,7 +54,8 @@ export default function Nav() {
     <header>
       <nav ref={navRef}>
         <NavLink to='/' className='logo'>
-          <img src='./logo.svg' alt='Logo Red Atlas' />
+          {/* Absolute path: on /detail/:id a relative one would point to /detail/logo.svg */}
+          <img src='/logo.svg' alt='Logo Red Atlas' />
         </NavLink>
         <div className='search'>
           {/* Results update while typing, so Enter must not reload the page */}
