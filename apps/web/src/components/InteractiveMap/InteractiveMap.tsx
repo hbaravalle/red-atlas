@@ -1,17 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import * as maplibregl from 'maplibre-gl';
-import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
 import type { Property } from '@red-atlas/shared';
-
-import 'maplibre-gl/dist/maplibre-gl.css';
-
-// MapLibre looks for its worker next to its own file, but Vite bundles the
-// library elsewhere, so point it at the worker Vite serves as an asset.
-maplibregl.setWorkerUrl(workerUrl);
-
-// Free OpenStreetMap vector tiles, no API key required
-const MAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
+import { MAP_STYLE, maplibregl } from '../../lib/maplibre';
 
 // Puerto Rico with Vieques and Culebra; every property in the dataset is inside
 const PUERTO_RICO_BOUNDS: maplibregl.LngLatBoundsLike = [
