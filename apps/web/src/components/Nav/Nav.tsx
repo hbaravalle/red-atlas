@@ -5,8 +5,8 @@ import { useForm } from 'react-hook-form';
 import type { Property } from '@red-atlas/shared';
 import defaultImage from '../../assets/property-default.jpg';
 import './Nav.scss';
-import { API_URL } from '../../lib/api';
 import { PROPERTY_STATUS_LABELS, PROPERTY_TYPE_LABELS } from '../../lib/labels';
+import { searchProperties } from '../../services/properties';
 
 interface SearchFormValues {
   query: string;
@@ -15,7 +15,7 @@ interface SearchFormValues {
 export default function Nav() {
   const { register, watch, setValue, setFocus } = useForm<SearchFormValues>();
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState<Property[]>([]);
   // The results list hides when the user moves on, but the text stays, so
   // focusing the field again brings the same results back
   const [isOpen, setIsOpen] = useState(false);
@@ -43,23 +43,23 @@ export default function Nav() {
   }, [watchedQuery]);
 
   useEffect(() => {
-    if (query.length >= 3) {
-      const fetchSearchResults = async () => {
-        try {
-          const response = await fetch(
-            `${API_URL}/properties/search?query=${encodeURIComponent(query)}`
-          );
-          const result = await response.json();
-          setResults(result.properties || []);
-        } catch (error) {
-          console.error('Error al realizar la búsqueda:', error);
-        }
-      };
-
-      fetchSearchResults();
-    } else {
+    if (query.length < 3) {
       setResults([]);
+      return;
     }
+
+    const controller = new AbortController();
+
+    searchProperties(query, { signal: controller.signal })
+      .then((result) => setResults(result.properties))
+      .catch((error) => {
+        if (controller.signal.aborted) return;
+        console.error('Error al realizar la búsqueda:', error);
+      });
+
+    // Typing again cancels this search, so a slow response for an older
+    // query can never replace the results of the newer one
+    return () => controller.abort();
   }, [query]);
 
   // Empty the field and keep the cursor in it, ready for a new search

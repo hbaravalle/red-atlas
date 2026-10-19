@@ -4,12 +4,16 @@ import { useForm } from 'react-hook-form';
 import { X } from 'react-feather';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
-import { fetchProperties } from '../../redux/propertiesSlice';
+import { invalidateList } from '../../redux/propertiesSlice';
 import { AppDispatch } from '../../redux/store';
 import './ModalCreate.scss';
-import { PROPERTY_TYPES } from '@red-atlas/shared';
-import { API_URL } from '../../lib/api';
+import {
+  PROPERTY_TYPES,
+  type PropertyStatus,
+  type PropertyType,
+} from '@red-atlas/shared';
 import { PROPERTY_TYPE_LABELS } from '../../lib/labels';
+import { ApiError, createProperty } from '../../services/properties';
 
 interface FormValues {
   title: string;
@@ -17,8 +21,8 @@ interface FormValues {
   price: number;
   description: string;
   images: string[];
-  type: string;
-  status: string;
+  type: PropertyType;
+  status: PropertyStatus;
   area: string;
   ownerName: string;
   contact: string;
@@ -55,28 +59,19 @@ export default function ModalCreate() {
   }, [navigate]);
 
   const onSubmit = async (data: FormValues) => {
-    console.log('Datos de la nueva propiedad:', data);
     try {
-      const response = await fetch(
-        `${API_URL}/properties`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data),
-        }
-      );
-
-      if (response.ok) {
-        toast.success('Propiedad creada exitosamente');
-        dispatch(fetchProperties());
-        handleClose();
-      } else {
-        toast.error('Error al crear la propiedad');
-      }
-    } catch {
-      toast.error('Error al crear la propiedad');
+      await createProperty(data);
+      toast.success('Propiedad creada exitosamente');
+      // The list reloads the page and sort it is showing
+      dispatch(invalidateList());
+      handleClose();
+    } catch (error) {
+      // A 400 carries the API's reason, e.g. a missing required field
+      const reason =
+        error instanceof ApiError && error.status === 400
+          ? `: ${error.message}`
+          : '';
+      toast.error(`Error al crear la propiedad${reason}`);
     }
   };
 

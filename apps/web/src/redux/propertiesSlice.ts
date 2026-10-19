@@ -1,32 +1,21 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { Property } from '@red-atlas/shared';
-import { API_URL } from '../lib/api';
 
 interface PropertiesState {
   list: Property[];
+  // Bumped when the data behind the list changes, so PropertyList reloads
+  // the page and sort it is showing
+  listVersion: number;
   searchResults: Property[];
   sort: string;
 }
 
 const initialState: PropertiesState = {
   list: [],
+  listVersion: 0,
   searchResults: [],
   sort: 'date',
 };
-
-export const fetchProperties = createAsyncThunk(
-  'properties/fetchProperties',
-  async () => {
-    const response = await fetch(
-      `${API_URL}/properties`
-    );
-    if (!response.ok) {
-      throw new Error('Error al obtener las propiedades');
-    }
-    const data = await response.json();
-    return data.properties;
-  }
-);
 
 const propertiesSlice = createSlice({
   name: 'properties',
@@ -44,14 +33,17 @@ const propertiesSlice = createSlice({
     setSort: (state, action: PayloadAction<string>) => {
       state.sort = action.payload;
     },
-  },
-  extraReducers: (builder) => {
-    builder.addCase(fetchProperties.fulfilled, (state, action) => {
-      state.list = action.payload;
-    });
+    invalidateList: (state) => {
+      state.listVersion += 1;
+    },
   },
 });
 
-export const { setProperties, addProperty, setSearchResults, setSort } =
-  propertiesSlice.actions;
+export const {
+  setProperties,
+  addProperty,
+  setSearchResults,
+  setSort,
+  invalidateList,
+} = propertiesSlice.actions;
 export default propertiesSlice.reducer;

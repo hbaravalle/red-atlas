@@ -1,53 +1,56 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router';
-import { DEFAULT_PAGE_SIZE, type Property } from '@red-atlas/shared';
+import {
+  DEFAULT_PAGE_SIZE,
+  type Property,
+  type SortOption,
+} from '@red-atlas/shared';
 import { setProperties } from '../../redux/propertiesSlice';
+import type { RootState } from '../../redux/store';
 import defaultImage from '../../assets/property-default.jpg';
 import PropertyCardSkeleton from './PropertyCardSkeleton';
 import './PropertyList.scss';
-import { API_URL } from '../../lib/api';
 import { formatTimeAgo } from '../../lib/format';
+import { getProperties } from '../../services/properties';
 import { PROPERTY_STATUS_LABELS, PROPERTY_TYPE_LABELS } from '../../lib/labels';
 
 export default function PropertyList() {
   const dispatch = useDispatch();
-  // const [properties, setPropertiesLocal] = useState<Property[]>([]);
   const [loading, setLoading] = useState(false);
-  const [sortedBy, setSortedBy] = useState('date');
+  const [sortedBy, setSortedBy] = useState<SortOption>('date');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const properties = useSelector(
-    (state: { properties: { list: Property[] } }) => state.properties.list
+    (state: RootState) => state.properties.list
+  );
+  const listVersion = useSelector(
+    (state: RootState) => state.properties.listVersion
   );
 
-  const fetchProperties = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `${API_URL}/properties?page=${page}&limit=${DEFAULT_PAGE_SIZE}${
-          sortedBy !== 'date' ? '&sort=' + sortedBy : ''
-        }`
-      );
-      const data = await response.json();
-      console.log(data);
-      // setPropertiesLocal(data.properties);
-      setTotalPages(data.totalPages);
-      dispatch(setProperties(data.properties));
-    } catch (error) {
-      console.error('Error fetching properties:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchProperties();
-  }, [sortedBy, page]);
+    const controller = new AbortController();
+    setLoading(true);
+
+    getProperties({ page, sort: sortedBy, signal: controller.signal })
+      .then((data) => {
+        setTotalPages(data.totalPages);
+        dispatch(setProperties(data.properties));
+        setLoading(false);
+      })
+      .catch((error) => {
+        // A newer page or sort replaced this request: its result is stale
+        if (controller.signal.aborted) return;
+        console.error('Error fetching properties:', error);
+        setLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [sortedBy, page, listVersion, dispatch]);
 
   // Cambiar el filtro
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSortedBy(event.target.value);
+    setSortedBy(event.target.value as SortOption);
     setPage(1);
   };
 

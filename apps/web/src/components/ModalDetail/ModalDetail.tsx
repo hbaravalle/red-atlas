@@ -5,7 +5,6 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, MapPin, X } from 'react-feather';
 import type { Property } from '@red-atlas/shared';
-import { API_URL } from '../../lib/api';
 import {
   formatArea,
   formatPrice,
@@ -13,6 +12,7 @@ import {
   formatTimeAgo,
 } from '../../lib/format';
 import { PROPERTY_STATUS_LABELS, PROPERTY_TYPE_LABELS } from '../../lib/labels';
+import { getProperty } from '../../services/properties';
 import defaultImage from '../../assets/property-default.jpg';
 import LocationMap from './LocationMap';
 import './ModalDetail.scss';
@@ -46,15 +46,14 @@ export default function ModalDetail() {
 
     const controller = new AbortController();
 
-    fetch(`${API_URL}/properties/${id}`, { signal: controller.signal })
-      .then(async (response) => {
-        if (response.status === 404) {
-          setFetched({ id, status: 'not-found' });
-          return;
-        }
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        setFetched({ id, status: 'ready', property: await response.json() });
-      })
+    getProperty(id, { signal: controller.signal })
+      .then((property) =>
+        setFetched(
+          property
+            ? { id, status: 'ready', property }
+            : { id, status: 'not-found' }
+        )
+      )
       .catch((error) => {
         if (controller.signal.aborted) return;
         console.error('Error al cargar la propiedad:', error);
