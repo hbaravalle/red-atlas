@@ -1,14 +1,17 @@
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import mapboxgl from 'mapbox-gl';
+import * as maplibregl from 'maplibre-gl';
 import type { Property } from '@red-atlas/shared';
 
-import 'mapbox-gl/dist/mapbox-gl.css';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
-const Mapbox = () => {
+// Free OpenStreetMap vector tiles, no API key required
+const MAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
+
+const InteractiveMap = () => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const mapRef = useRef<maplibregl.Map | null>(null);
+  const markersRef = useRef<maplibregl.Marker[]>([]);
 
   const properties = useSelector(
     (state: { properties: { list: Property[] } }) => state.properties.list
@@ -21,10 +24,9 @@ const Mapbox = () => {
     const offset = (mapWidth * 0.1) / 100;
 
     if (!mapRef.current) {
-      mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
-
-      mapRef.current = new mapboxgl.Map({
+      mapRef.current = new maplibregl.Map({
         container: mapContainerRef.current,
+        style: MAP_STYLE,
         center: [-66.18364529517915 + offset, 18.21364781851135],
         zoom: 7,
       });
@@ -37,7 +39,7 @@ const Mapbox = () => {
     // Crear nuevos marcadores
     for (const property of properties) {
       if (property.location?.lng && property.location?.lat) {
-        const marker = new mapboxgl.Marker()
+        const marker = new maplibregl.Marker()
           .setLngLat([
             Number(property.location.lng),
             Number(property.location.lat),
@@ -64,4 +66,4 @@ const Mapbox = () => {
   );
 };
 
-export default Mapbox;
+export default InteractiveMap;

@@ -7,7 +7,7 @@ A responsive real estate app to browse, search and publish property listings on 
 ![React](https://img.shields.io/badge/React_18-20232A?style=flat-square&logo=react&logoColor=61DAFB)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
 ![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-764ABC?style=flat-square&logo=redux&logoColor=white)
-![Mapbox](https://img.shields.io/badge/Mapbox_GL-000000?style=flat-square&logo=mapbox&logoColor=white)
+![MapLibre](https://img.shields.io/badge/MapLibre_GL-396CB2?style=flat-square&logo=maplibre&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-000000?style=flat-square&logo=express&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white)
@@ -31,7 +31,7 @@ This repo keeps both halves together, so the whole story — and the contract be
 
 **Web app** (`apps/web`)
 - Property list with server-side pagination and sorting by date or price
-- Interactive Mapbox map with a marker for every listed property
+- Interactive map (MapLibre GL + free OpenStreetMap tiles from OpenFreeMap, no API key) with a marker for every listed property
 - Search by title or address, resolved by the API
 - Property detail as a routed modal (`/detail/:id`), so every property has a shareable URL
 - Create a property (`/create`) with a form validated by React Hook Form
@@ -49,7 +49,7 @@ This repo keeps both halves together, so the whole story — and the contract be
 ```
 red-atlas/
 ├── apps/
-│   ├── web/          # React 18 + TypeScript + Vite + Redux Toolkit + Mapbox
+│   ├── web/          # React 18 + TypeScript + Vite + Redux Toolkit + MapLibre
 │   └── api/          # Node.js + Express + Mongoose
 ├── packages/
 │   └── shared/       # Property domain shared by both apps
@@ -93,7 +93,7 @@ curl "https://api-red-atlas-livid.vercel.app/api/properties/search?query=suite&s
 
 ## 🚀 Running locally
 
-**Prerequisites:** Node.js 20+, [pnpm](https://pnpm.io/installation), a MongoDB connection string ([Atlas](https://www.mongodb.com/atlas) free tier works) and a free [Mapbox token](https://account.mapbox.com/access-tokens/).
+**Prerequisites:** Node.js 20+, [pnpm](https://pnpm.io/installation), a MongoDB connection string ([Atlas](https://www.mongodb.com/atlas) free tier works). The map needs no API key.
 
 ```bash
 git clone https://github.com/hbaravalle/red-atlas.git
@@ -102,7 +102,7 @@ pnpm install
 
 # Environment variables
 cp apps/api/.env.example apps/api/.env   # set DB_CONNECTION
-cp apps/web/.env.example apps/web/.env   # set VITE_MAPBOX_TOKEN
+cp apps/web/.env.example apps/web/.env   # optional: VITE_API_URL
 
 # Load sample data (optional)
 pnpm seed
@@ -127,7 +127,7 @@ Both apps deploy to Vercel as two projects from this repository:
 
 | Project | Root directory | Notes |
 |---|---|---|
-| Web | `apps/web` | Framework preset: Vite. Env: `VITE_MAPBOX_TOKEN` |
+| Web | `apps/web` | Framework preset: Vite. No env vars required |
 | API | `apps/api` | Uses `apps/api/vercel.json`. Env: `DB_CONNECTION` |
 
 ## 🗺️ Roadmap
@@ -136,7 +136,7 @@ Both apps deploy to Vercel as two projects from this repository:
 - [ ] Advanced filters (type, status, price range) on both API and UI
 - [ ] Request validation and consistent error responses in the API
 - [ ] Custom hooks to share data-fetching logic in the web app
-- [ ] Code-split Mapbox to shrink the initial bundle
+- [ ] Code-split MapLibre to shrink the initial bundle
 
 ## 👤 Author
 

@@ -1,7 +1,7 @@
 {
   "name": "red-atlas",
   "private": true,
-  "description": "Real estate property finder: React + Mapbox front end and Express + MongoDB API in one pnpm workspace.",
+  "description": "Real estate property finder: React + MapLibre front end and Express + MongoDB API in one pnpm workspace.",
   "packageManager": "pnpm@10.18.0",
   "engines": {
     "node": ">=20"

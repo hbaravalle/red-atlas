@@ -1,6 +1,6 @@
 # Red Atlas — Web app
 
-React 18 + TypeScript front end for Red Atlas: property list with pagination and sorting, Mapbox map, search, detail modal and create form.
+React 18 + TypeScript front end for Red Atlas: property list with pagination and sorting, MapLibre map (OpenFreeMap tiles, no API key), search, detail modal and create form.
 
 See the [main README](../../README.md) for the full project, architecture and setup.
 
@@ -11,7 +11,6 @@ pnpm dev:web
 
 | Env variable | Description |
 |---|---|
-| `VITE_MAPBOX_TOKEN` | Mapbox access token (required for the map) |
 | `VITE_API_URL` | API base URL. Defaults to the production API |
 
 ```
