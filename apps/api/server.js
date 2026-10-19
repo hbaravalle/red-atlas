@@ -12,6 +12,9 @@ app.use(
   })
 );
 app.use(express.json());
+// Files in public/ (the favicon). On Vercel the CDN serves them before the
+// request reaches the app; locally express.static does it
+app.use(express.static('public'));
 
 app.use('/api/properties', propertiesRoutes);
 
