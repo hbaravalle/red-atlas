@@ -9,11 +9,12 @@ import {
 } from '../../redux/propertiesApi';
 import './ModalCreate.scss';
 import {
+  PROPERTY_STATUSES,
   PROPERTY_TYPES,
   type PropertyStatus,
   type PropertyType,
 } from '@red-atlas/shared';
-import { PROPERTY_TYPE_LABELS } from '../../lib/labels';
+import { PROPERTY_STATUS_LABELS, PROPERTY_TYPE_LABELS } from '../../lib/labels';
 
 interface FormValues {
   title: string;
@@ -213,33 +214,27 @@ export default function ModalCreate() {
               )}
             </div>
 
-            {/* Estado con Radio buttons */}
+            {/* Operación con Radio buttons: same labels as cards and detail */}
             <div className='form-group'>
-              <label>Estado</label>
+              <label>Operación</label>
               <div className='radiobtn-group'>
-                <label htmlFor='status-rent'>
-                  <input
-                    id='status-rent'
-                    type='radio'
-                    value='rent'
-                    {...register('status', {
-                      required: 'El estado es obligatorio',
-                    })}
-                  />
-                  Rentar
-                </label>
-                <label htmlFor='status-sale'>
-                  <input
-                    id='status-sale'
-                    type='radio'
-                    value='sale'
-                    {...register('status', {
-                      required: 'El estado es obligatorio',
-                    })}
-                  />
-                  Vender
-                </label>
+                {PROPERTY_STATUSES.map((status) => (
+                  <label htmlFor={`status-${status}`} key={status}>
+                    <input
+                      id={`status-${status}`}
+                      type='radio'
+                      value={status}
+                      {...register('status', {
+                        required: 'La operación es obligatoria',
+                      })}
+                    />
+                    {PROPERTY_STATUS_LABELS[status]}
+                  </label>
+                ))}
               </div>
+              {errors.status && (
+                <span className='error'>{errors.status.message}</span>
+              )}
             </div>
 
           </div>
