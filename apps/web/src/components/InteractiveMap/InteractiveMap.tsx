@@ -13,6 +13,56 @@ maplibregl.setWorkerUrl(workerUrl);
 // Free OpenStreetMap vector tiles, no API key required
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
 
+// Puerto Rico with Vieques and Culebra; every property in the dataset is inside
+const PUERTO_RICO_BOUNDS: maplibregl.LngLatBoundsLike = [
+  [-67.3, 17.8],
+  [-65.2, 18.5],
+];
+const GAP = 20;
+// Below this, the free area is too small to frame the island in
+const MIN_VISIBLE_SIZE = 150;
+
+// The search bar and the property list float over the map. Measure them so
+// Puerto Rico is framed in the area they leave uncovered: the list is a column
+// on the right on desktop and a sheet at the bottom on smaller screens.
+function getUncoveredPadding(): maplibregl.PaddingOptions {
+  const padding = { top: GAP, right: GAP, bottom: GAP, left: GAP };
+  const nav = document.querySelector('header nav');
+  const list = document.getElementById('propertyList');
+
+  if (nav) {
+    padding.top = nav.getBoundingClientRect().bottom + GAP;
+  }
+
+  if (list) {
+    const rect = list.getBoundingClientRect();
+    const isSideColumn = rect.left > window.innerWidth / 3;
+
+    if (isSideColumn) {
+      padding.right = window.innerWidth - rect.left + GAP;
+    } else {
+      padding.bottom = window.innerHeight - rect.top + GAP;
+    }
+  }
+
+  if (window.innerWidth - padding.left - padding.right < MIN_VISIBLE_SIZE) {
+    padding.right = GAP;
+  }
+  if (window.innerHeight - padding.top - padding.bottom < MIN_VISIBLE_SIZE) {
+    padding.top = GAP;
+    padding.bottom = GAP;
+  }
+
+  return padding;
+}
+
+function framePuertoRico(map: maplibregl.Map) {
+  map.fitBounds(PUERTO_RICO_BOUNDS, {
+    padding: getUncoveredPadding(),
+    duration: 0,
+  });
+}
+
 const InteractiveMap = () => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -25,16 +75,17 @@ const InteractiveMap = () => {
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
-    const mapWidth = window.innerWidth;
-    const offset = (mapWidth * 0.1) / 100;
-
     if (!mapRef.current) {
-      mapRef.current = new maplibregl.Map({
+      const map = new maplibregl.Map({
         container: mapContainerRef.current,
         style: MAP_STYLE,
-        center: [-66.18364529517915 + offset, 18.21364781851135],
-        zoom: 7,
+        bounds: PUERTO_RICO_BOUNDS,
+        fitBoundsOptions: { padding: getUncoveredPadding() },
       });
+
+      // The panels change size with the window, so frame the island again
+      map.on('resize', () => framePuertoRico(map));
+      mapRef.current = map;
     }
 
     // Limpiar los marcadores previos
