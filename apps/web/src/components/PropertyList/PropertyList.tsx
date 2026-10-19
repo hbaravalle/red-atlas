@@ -6,6 +6,7 @@ import { es } from 'date-fns/locale';
 import { DEFAULT_PAGE_SIZE, type Property } from '@red-atlas/shared';
 import { setProperties } from '../../redux/propertiesSlice';
 import defaultImage from '../../assets/property-default.jpg';
+import PropertyCardSkeleton from './PropertyCardSkeleton';
 import './PropertyList.scss';
 import { API_URL } from '../../lib/api';
 import { PROPERTY_STATUS_LABELS, PROPERTY_TYPE_LABELS } from '../../lib/labels';
@@ -75,9 +76,16 @@ export default function PropertyList() {
             </select>
           </form>
         </div>
-        <div className='cards'>
+        <div className='cards' aria-busy={loading}>
           {loading ? (
-            <p>Cargando propiedades...</p>
+            <>
+              <p className='visually-hidden' role='status'>
+                Cargando propiedades...
+              </p>
+              {Array.from({ length: DEFAULT_PAGE_SIZE }, (_, index) => (
+                <PropertyCardSkeleton key={index} />
+              ))}
+            </>
           ) : (
             properties.map((property: Property) => (
               <NavLink
