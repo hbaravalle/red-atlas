@@ -13,8 +13,8 @@ export interface Property {
   title: string;
   description: string;
   location: {
-    lat: string;
-    lng: string;
+    lat: number;
+    lng: number;
   };
   address: string;
   images: string[];
