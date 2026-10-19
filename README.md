@@ -17,7 +17,7 @@ A responsive real estate app to browse, search and publish property listings on 
 
 ## The challenge
 
-Build a front end to list, manage and locate real estate properties: React + TypeScript, global state, routing, a responsive layout and an interactive map. The challenge shipped with a static dataset of **10,000 properties** (`apps/web/properties.json`).
+Build a front end to list, manage and locate real estate properties: React + TypeScript, global state, routing, a responsive layout and an interactive map. The challenge shipped with a static dataset of **10,000 properties** (`apps/api/seeders/properties.json`), which seeds the API's database.
 
 ## The key decision: build my own API
 

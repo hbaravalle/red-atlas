@@ -166,4 +166,16 @@ async function destroy(id) {
   return deleted.length > 0;
 }
 
-export default { findPage, findById, count, create, createMany, destroy };
+async function destroyAll() {
+  await db.delete(properties);
+}
+
+export default {
+  findPage,
+  findById,
+  count,
+  create,
+  createMany,
+  destroy,
+  destroyAll,
+};
