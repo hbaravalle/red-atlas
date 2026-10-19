@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm';
+import { asc, desc, eq, ilike, or, sql } from 'drizzle-orm';
 import {
   boolean,
   check,
@@ -11,6 +11,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 import { PROPERTY_STATUSES, PROPERTY_TYPES } from '@red-atlas/shared';
+import db from '../config/db.js';
 
 // DDL can't take bind parameters, so the allowed values are inlined as SQL
 // literals. Safe here: they come from our own constants, never from user input.
@@ -52,3 +53,117 @@ export const properties = snakeCase.table(
     index('properties_price_idx').on(table.price),
   ],
 );
+
+// Sort options map to column objects, so user input never reaches the SQL.
+// The id tiebreaker keeps pages stable when several rows share a price.
+const ORDER_BY = {
+  price_asc: [asc(properties.price), asc(properties.id)],
+  price_desc: [desc(properties.price), desc(properties.id)],
+};
+const DEFAULT_ORDER = [desc(properties.createdAt), desc(properties.id)];
+
+// Any UUID version: ids are v7, but a v4-only pattern would reject them.
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// null for missing or non-numeric input, so NOT NULL rejects it instead of
+// Postgres silently storing NaN in a double precision column.
+function toNumber(value) {
+  const number = Number(value);
+  return value == null || value === '' || Number.isNaN(number) ? null : number;
+}
+
+// Treat %, _ and \ in the search text as literal characters, not wildcards.
+function escapeLike(text) {
+  return text.replace(/[\\%_]/g, '\\$&');
+}
+
+// Row from the database → the JSON shape the web app consumes.
+function toProperty(row) {
+  const { id, lat, lng, price, area, ownerName, ownerContact, ...rest } = row;
+
+  return {
+    _id: id,
+    ...rest,
+    location: { lat, lng },
+    price: toNumber(price),
+    area: toNumber(area),
+    owner: { name: ownerName, contact: ownerContact },
+  };
+}
+
+// API shape (nested location and owner) → table columns. Undefined values
+// are left out of the INSERT, so the column defaults apply.
+function toRow(property) {
+  const { location, owner, createdAt, updatedAt } = property;
+
+  return {
+    title: property.title,
+    description: property.description,
+    address: property.address,
+    lat: toNumber(location?.lat),
+    lng: toNumber(location?.lng),
+    images: property.images,
+    type: property.type,
+    status: property.status,
+    isActive: property.isActive,
+    price: toNumber(property.price),
+    area: toNumber(property.area),
+    ownerName: owner?.name,
+    ownerContact: owner?.contact,
+    createdAt: createdAt ? new Date(createdAt) : undefined,
+    updatedAt: updatedAt ? new Date(updatedAt) : undefined,
+  };
+}
+
+async function findPage({ query, sort, page, limit }) {
+  const pattern = query && `%${escapeLike(query)}%`;
+  const where = pattern
+    ? or(ilike(properties.title, pattern), ilike(properties.address, pattern))
+    : undefined;
+
+  const [rows, total] = await Promise.all([
+    db
+      .select()
+      .from(properties)
+      .where(where)
+      .orderBy(...(ORDER_BY[sort] ?? DEFAULT_ORDER))
+      .limit(limit)
+      .offset((page - 1) * limit),
+    db.$count(properties, where),
+  ]);
+
+  return { properties: rows.map(toProperty), total };
+}
+
+async function findById(id) {
+  if (!UUID_PATTERN.test(id)) return null;
+
+  const [row] = await db.select().from(properties).where(eq(properties.id, id));
+  return row ? toProperty(row) : null;
+}
+
+async function count() {
+  return db.$count(properties);
+}
+
+async function create(property) {
+  const [row] = await db.insert(properties).values(toRow(property)).returning();
+  return toProperty(row);
+}
+
+async function createMany(list) {
+  await db.insert(properties).values(list.map(toRow));
+}
+
+async function destroy(id) {
+  if (!UUID_PATTERN.test(id)) return false;
+
+  const deleted = await db
+    .delete(properties)
+    .where(eq(properties.id, id))
+    .returning({ id: properties.id });
+  return deleted.length > 0;
+}
+
+export default { findPage, findById, count, create, createMany, destroy };
