@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { NavLink, useNavigate, useParams } from 'react-router';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -12,7 +11,11 @@ import {
   formatTimeAgo,
 } from '../../lib/format';
 import { PROPERTY_STATUS_LABELS, PROPERTY_TYPE_LABELS } from '../../lib/labels';
-import { getProperty } from '../../services/properties';
+import {
+  useGetPropertiesQuery,
+  useGetPropertyQuery,
+} from '../../redux/propertiesApi';
+import { useAppSelector } from '../../redux/store';
 import defaultImage from '../../assets/property-default.jpg';
 import LocationMap from './LocationMap';
 import './ModalDetail.scss';
@@ -23,52 +26,39 @@ type LoadState =
   | { status: 'not-found' }
   | { status: 'error' };
 
-// Result of fetching one id, so a stale result never shows for another id
-type FetchResult = LoadState & { id: string };
-
 // Longer descriptions start collapsed behind "Leer más"
 const DESCRIPTION_PREVIEW_LENGTH = 280;
 
 export default function ModalDetail() {
-  const { id } = useParams();
+  const { id = '' } = useParams();
   const navigate = useNavigate();
-  const properties = useSelector(
-    (state: { properties: { list: Property[] } }) => state.properties.list
-  );
-  const [fetched, setFetched] = useState<FetchResult | null>(null);
 
-  // Properties from the current page are already in the store: show them on
-  // the first render instead of flashing a loading state
-  const listed = properties.find((property) => property._id === id);
+  // Properties from the current page are already cached: show them on the
+  // first render instead of flashing a loading state
+  const listParams = useAppSelector((state) => state.properties);
+  const { listed } = useGetPropertiesQuery(listParams, {
+    selectFromResult: ({ data }) => ({
+      listed: data?.properties.find((property) => property._id === id),
+    }),
+  });
 
-  useEffect(() => {
-    if (listed || !id) return;
+  // Anything else (a search result, a reload on /detail/:id) is fetched once
+  // and cached by id, so opening it again is instant
+  const { currentData, isError } = useGetPropertyQuery(id, {
+    skip: Boolean(listed) || !id,
+  });
 
-    const controller = new AbortController();
-
-    getProperty(id, { signal: controller.signal })
-      .then((property) =>
-        setFetched(
-          property
-            ? { id, status: 'ready', property }
-            : { id, status: 'not-found' }
-        )
-      )
-      .catch((error) => {
-        if (controller.signal.aborted) return;
-        console.error('Error al cargar la propiedad:', error);
-        setFetched({ id, status: 'error' });
-      });
-
-    // A newer id or closing the modal cancels the pending request
-    return () => controller.abort();
-  }, [id, listed]);
-
+  // currentData is undefined while the current id loads, so the previous
+  // property never shows for a new one
   const state: LoadState = listed
     ? { status: 'ready', property: listed }
-    : fetched && fetched.id === id
-      ? fetched
-      : { status: 'loading' };
+    : isError
+      ? { status: 'error' }
+      : currentData === undefined
+        ? { status: 'loading' }
+        : currentData === null
+          ? { status: 'not-found' }
+          : { status: 'ready', property: currentData };
 
   const handleClose = () => navigate('/');
 

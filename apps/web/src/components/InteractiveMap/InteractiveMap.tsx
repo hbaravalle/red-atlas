@@ -1,7 +1,12 @@
 import { useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
 import type { Property } from '@red-atlas/shared';
 import { MAP_STYLE, maplibregl } from '../../lib/maplibre';
+import { useGetPropertiesQuery } from '../../redux/propertiesApi';
+import { useAppSelector } from '../../redux/store';
+
+// Stable empty list, so the markers effect does not rerun on every render
+// while the first page loads
+const NO_PROPERTIES: Property[] = [];
 
 // Puerto Rico with Vieques and Culebra; every property in the dataset is inside
 const PUERTO_RICO_BOUNDS: maplibregl.LngLatBoundsLike = [
@@ -58,9 +63,10 @@ const InteractiveMap = () => {
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markersRef = useRef<maplibregl.Marker[]>([]);
 
-  const properties = useSelector(
-    (state: { properties: { list: Property[] } }) => state.properties.list
-  );
+  // Same arguments as PropertyList, so RTK Query serves both from one request
+  const listParams = useAppSelector((state) => state.properties);
+  const { data } = useGetPropertiesQuery(listParams);
+  const properties = data?.properties ?? NO_PROPERTIES;
 
   useEffect(() => {
     if (!mapContainerRef.current) return;

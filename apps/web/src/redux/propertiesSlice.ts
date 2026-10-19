@@ -1,19 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { Property } from '@red-atlas/shared';
+import type { SortOption } from '@red-atlas/shared';
+import type { ListParams } from './propertiesApi';
 
-interface PropertiesState {
-  list: Property[];
-  // Bumped when the data behind the list changes, so PropertyList reloads
-  // the page and sort it is showing
-  listVersion: number;
-  searchResults: Property[];
-  sort: string;
-}
+// Client state: which page and sort the user picked. The list, the map and
+// the detail modal read it to ask RTK Query for the same, cached page.
 
-const initialState: PropertiesState = {
-  list: [],
-  listVersion: 0,
-  searchResults: [],
+const initialState: ListParams = {
+  page: 1,
   sort: 'date',
 };
 
@@ -21,29 +14,16 @@ const propertiesSlice = createSlice({
   name: 'properties',
   initialState,
   reducers: {
-    setProperties: (state, action: PayloadAction<Property[]>) => {
-      state.list = action.payload;
+    setPage: (state, action: PayloadAction<number>) => {
+      state.page = action.payload;
     },
-    addProperty: (state, action: PayloadAction<Property>) => {
-      state.list.push(action.payload);
-    },
-    setSearchResults: (state, action: PayloadAction<Property[]>) => {
-      state.searchResults = action.payload;
-    },
-    setSort: (state, action: PayloadAction<string>) => {
+    // A new order starts again from the first page
+    setSort: (state, action: PayloadAction<SortOption>) => {
       state.sort = action.payload;
-    },
-    invalidateList: (state) => {
-      state.listVersion += 1;
+      state.page = 1;
     },
   },
 });
 
-export const {
-  setProperties,
-  addProperty,
-  setSearchResults,
-  setSort,
-  invalidateList,
-} = propertiesSlice.actions;
+export const { setPage, setSort } = propertiesSlice.actions;
 export default propertiesSlice.reducer;

@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { X } from 'react-feather';
 import toast from 'react-hot-toast';
-import { useDispatch } from 'react-redux';
-import { invalidateList } from '../../redux/propertiesSlice';
-import { AppDispatch } from '../../redux/store';
+import {
+  useCreatePropertyMutation,
+  type QueryError,
+} from '../../redux/propertiesApi';
 import './ModalCreate.scss';
 import {
   PROPERTY_TYPES,
@@ -13,7 +14,6 @@ import {
   type PropertyType,
 } from '@red-atlas/shared';
 import { PROPERTY_TYPE_LABELS } from '../../lib/labels';
-import { ApiError, createProperty } from '../../services/properties';
 
 interface FormValues {
   title: string;
@@ -33,8 +33,15 @@ interface FormValues {
   };
 }
 
+const isQueryError = (error: unknown): error is QueryError =>
+  typeof error === 'object' &&
+  error !== null &&
+  'status' in error &&
+  'message' in error;
+
 export default function ModalCreate() {
-  const dispatch = useDispatch<AppDispatch>();
+  const [createProperty, { isLoading: isSaving }] =
+    useCreatePropertyMutation();
   const {
     register,
     handleSubmit,
@@ -60,17 +67,15 @@ export default function ModalCreate() {
 
   const onSubmit = async (data: FormValues) => {
     try {
-      await createProperty(data);
+      // The mutation invalidates the cached lists, so the page and sort on
+      // screen reload on their own
+      await createProperty(data).unwrap();
       toast.success('Propiedad creada exitosamente');
-      // The list reloads the page and sort it is showing
-      dispatch(invalidateList());
       handleClose();
     } catch (error) {
       // A 400 carries the API's reason, e.g. a missing required field
       const reason =
-        error instanceof ApiError && error.status === 400
-          ? `: ${error.message}`
-          : '';
+        isQueryError(error) && error.status === 400 ? `: ${error.message}` : '';
       toast.error(`Error al crear la propiedad${reason}`);
     }
   };
@@ -243,7 +248,10 @@ export default function ModalCreate() {
             <button type='button' className='cancel' onClick={handleClose}>
               Cancelar
             </button>
-            <button type='submit'>Crear propiedad</button>
+            {/* Disabled while saving, so a double click does not create two */}
+            <button type='submit' disabled={isSaving}>
+              {isSaving ? 'Creando...' : 'Crear propiedad'}
+            </button>
           </footer>
         </form>
       </div>

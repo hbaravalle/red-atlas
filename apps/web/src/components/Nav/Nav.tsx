@@ -6,7 +6,7 @@ import type { Property } from '@red-atlas/shared';
 import defaultImage from '../../assets/property-default.jpg';
 import './Nav.scss';
 import { PROPERTY_STATUS_LABELS, PROPERTY_TYPE_LABELS } from '../../lib/labels';
-import { searchProperties } from '../../services/properties';
+import { useSearchPropertiesQuery } from '../../redux/propertiesApi';
 
 interface SearchFormValues {
   query: string;
@@ -14,8 +14,6 @@ interface SearchFormValues {
 
 export default function Nav() {
   const { register, watch, setValue, setFocus } = useForm<SearchFormValues>();
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<Property[]>([]);
   // The results list hides when the user moves on, but the text stays, so
   // focusing the field again brings the same results back
   const [isOpen, setIsOpen] = useState(false);
@@ -36,31 +34,15 @@ export default function Nav() {
     return () => document.removeEventListener('pointerdown', handlePointerDown);
   }, []);
 
-  const watchedQuery = watch('query', '');
+  const query = watch('query', '');
 
-  useEffect(() => {
-    setQuery(watchedQuery);
-  }, [watchedQuery]);
-
-  useEffect(() => {
-    if (query.length < 3) {
-      setResults([]);
-      return;
-    }
-
-    const controller = new AbortController();
-
-    searchProperties(query, { signal: controller.signal })
-      .then((result) => setResults(result.properties))
-      .catch((error) => {
-        if (controller.signal.aborted) return;
-        console.error('Error al realizar la búsqueda:', error);
-      });
-
-    // Typing again cancels this search, so a slow response for an older
-    // query can never replace the results of the newer one
-    return () => controller.abort();
-  }, [query]);
+  // Each query is cached, so deleting a letter shows the earlier results at
+  // once. While a new query loads, the previous results stay on screen, and a
+  // slow response for an older query never replaces those of the newer one.
+  const { data } = useSearchPropertiesQuery(query, {
+    skip: query.length < 3,
+  });
+  const results = query.length >= 3 ? (data?.properties ?? []) : [];
 
   // Empty the field and keep the cursor in it, ready for a new search
   const clearSearch = () => {
@@ -91,7 +73,7 @@ export default function Nav() {
                 if (event.key === 'Escape') clearSearch();
               }}
             />
-            {watchedQuery.length > 0 && (
+            {query.length > 0 && (
               <button
                 type='button'
                 className='clear'

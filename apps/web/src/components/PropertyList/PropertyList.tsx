@@ -1,62 +1,39 @@
-import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router';
 import {
   DEFAULT_PAGE_SIZE,
   type Property,
   type SortOption,
 } from '@red-atlas/shared';
-import { setProperties } from '../../redux/propertiesSlice';
-import type { RootState } from '../../redux/store';
+import { useGetPropertiesQuery } from '../../redux/propertiesApi';
+import { setPage, setSort } from '../../redux/propertiesSlice';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
 import defaultImage from '../../assets/property-default.jpg';
 import PropertyCardSkeleton from './PropertyCardSkeleton';
 import './PropertyList.scss';
 import { formatTimeAgo } from '../../lib/format';
-import { getProperties } from '../../services/properties';
 import { PROPERTY_STATUS_LABELS, PROPERTY_TYPE_LABELS } from '../../lib/labels';
 
+const NO_PROPERTIES: Property[] = [];
+
 export default function PropertyList() {
-  const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false);
-  const [sortedBy, setSortedBy] = useState<SortOption>('date');
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const properties = useSelector(
-    (state: RootState) => state.properties.list
-  );
-  const listVersion = useSelector(
-    (state: RootState) => state.properties.listVersion
-  );
-
-  useEffect(() => {
-    const controller = new AbortController();
-    setLoading(true);
-
-    getProperties({ page, sort: sortedBy, signal: controller.signal })
-      .then((data) => {
-        setTotalPages(data.totalPages);
-        dispatch(setProperties(data.properties));
-        setLoading(false);
-      })
-      .catch((error) => {
-        // A newer page or sort replaced this request: its result is stale
-        if (controller.signal.aborted) return;
-        console.error('Error fetching properties:', error);
-        setLoading(false);
-      });
-
-    return () => controller.abort();
-  }, [sortedBy, page, listVersion, dispatch]);
+  const dispatch = useAppDispatch();
+  const listParams = useAppSelector((state) => state.properties);
+  const { page, sort } = listParams;
+  // isFetching is also true while a cached page refreshes, e.g. after a
+  // property is created, so the skeleton shows whenever the list may change
+  const { data, isFetching, isError, refetch } =
+    useGetPropertiesQuery(listParams);
+  const properties = data?.properties ?? NO_PROPERTIES;
+  const totalPages = data?.totalPages ?? 1;
 
   // Cambiar el filtro
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSortedBy(event.target.value as SortOption);
-    setPage(1);
+    dispatch(setSort(event.target.value as SortOption));
   };
 
   // Cambiar la página
   const handlePageChange = (newPage: number) => {
-    setPage(newPage);
+    dispatch(setPage(newPage));
   };
 
   return (
@@ -70,7 +47,7 @@ export default function PropertyList() {
               name='filter'
               id='filter'
               onChange={handleSortChange}
-              value={sortedBy}
+              value={sort}
             >
               <option value='date'>Fecha de publicación</option>
               <option value='price_asc'>Precio, de menor a mayor</option>
@@ -78,8 +55,8 @@ export default function PropertyList() {
             </select>
           </form>
         </div>
-        <div className='cards' aria-busy={loading}>
-          {loading ? (
+        <div className='cards' aria-busy={isFetching}>
+          {isFetching ? (
             <>
               <p className='visually-hidden' role='status'>
                 Cargando propiedades...
@@ -88,6 +65,13 @@ export default function PropertyList() {
                 <PropertyCardSkeleton key={index} />
               ))}
             </>
+          ) : isError ? (
+            <div className='list-error' role='alert'>
+              <p>No pudimos cargar las propiedades.</p>
+              <button type='button' onClick={refetch}>
+                Reintentar
+              </button>
+            </div>
           ) : (
             properties.map((property: Property) => (
               <NavLink

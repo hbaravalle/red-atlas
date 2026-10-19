@@ -139,6 +139,11 @@
             background-color: red;
             color: #fff;
             border: none;
+
+            &:disabled {
+              opacity: 0.6;
+              cursor: progress;
+            }
           }
 
           &.cancel {
