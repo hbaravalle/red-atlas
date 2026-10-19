@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import cors from 'cors';
 import express from 'express';
-import connectDB from './config/mongoose.config.js';
 import propertiesRoutes from './routes/propertyRoutes.js';
 
 const PORT = process.env.APP_PORT || process.env.PORT || 3000;
@@ -13,7 +12,6 @@ app.use(
   })
 );
 app.use(express.json());
-connectDB();
 
 app.use('/api/properties', propertiesRoutes);
 
