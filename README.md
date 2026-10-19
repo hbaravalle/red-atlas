@@ -1,6 +1,6 @@
 # Red Atlas — Property Finder
 
-A responsive real estate app to browse, search and publish property listings on an interactive map — with the REST API I designed to power it. Built as my solution to the **Red Atlas Mid-Level Front-End Challenge**.
+A responsive real estate app to browse, search and publish property listings on an interactive map — with the REST API I designed to power it. Built as my solution to the **Red Atlas Front-End Challenge**.
 
 **🚀 [Live demo](https://mid-frontend-challenge.vercel.app/)** · **🔌 [API](https://api-red-atlas-livid.vercel.app/api/properties)**
 
