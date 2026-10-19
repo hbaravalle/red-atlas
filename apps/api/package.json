@@ -16,10 +16,12 @@
     "@neondatabase/serverless": "^1.2.0",
     "@red-atlas/shared": "workspace:*",
     "cors": "^2.8.5",
+    "drizzle-orm": "1.0.0-rc.4",
     "express": "^4.21.2"
   },
   "devDependencies": {
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "drizzle-kit": "1.0.0-rc.4"
   },
   "private": true
 }
