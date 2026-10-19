@@ -21,9 +21,11 @@ A responsive real estate app to browse, search and publish property listings on 
 
 Build a front end to list, manage and locate real estate properties: React + TypeScript, global state, routing, a responsive layout and an interactive map. The challenge shipped with a static dataset of **10,000 properties** (`apps/api/seeders/properties.json`), which seeds the API's database.
 
+The challenge only required the front end. Building a back end to serve the data was listed as an **optional extra**, one that Red Atlas said would add value to the solution.
+
 ## The key decision: build my own API
 
-Sorting, paginating and searching 10,000 records in the browser means downloading all of them up front and doing the heavy lifting on the user's device — slow on first load and worse on phones.
+I took on that extra because the dataset made the case for it. Sorting, paginating and searching 10,000 records in the browser means downloading all of them up front and doing the heavy lifting on the user's device — slow on first load and worse on phones.
 
 So I moved that work to the server. I designed a small REST API with Node.js, Express and Postgres that handles **pagination, sorting and text search** and returns exactly one page at a time, with the metadata the UI needs (`totalPages`, `prevPage`, `nextPage`). The front end stays thin: it asks for a page and renders it.
 
@@ -78,7 +80,7 @@ The package is plain JavaScript with hand-written type declarations, so the API 
 
 **Layers in the API.** Routes map URLs to the controller, which only deals with HTTP: reading the request, validating it and choosing the status code. Every query lives in the model (`models/Property.js`), next to the Drizzle table definition and the mapping between table rows and the JSON the web app expects.
 
-**State and routing.** Redux Toolkit holds the property list and modal state. Routes drive the modals, so the browser's back button works as users expect.
+**State and routing.** The web app keeps server state and client state apart. **RTK Query** caches every API response by its arguments: the list, the map and the detail modal ask for the same page and share one request, and creating a property invalidates the cached lists so the page on screen reloads by itself. A small Redux slice holds the only client state the components share: the page and sort the user picked. All requests go through one service module (`src/services/properties.ts`) that builds the URLs and types the responses with the shared contract. Routes drive the modals, so the browser's back button works as users expect.
 
 ## 📖 API reference
 
@@ -150,16 +152,6 @@ Both apps deploy to Vercel as two projects from this repository:
 | API | `apps/api` | Uses `apps/api/vercel.json`. Env: `DATABASE_URL` (Neon `main` branch) |
 
 Migrations are not run on deploy. Before shipping a schema change, run `pnpm migrate` with `DATABASE_URL` pointing at the production branch.
-
-## 🗺️ Roadmap
-
-- [ ] Edit-property form and `PUT /properties/:id` (route reserved, handler pending)
-- [ ] Advanced filters (type, status, price range) on both API and UI
-- [ ] Schema-based request validation (for example with Zod) and one error format across the API
-- [ ] Express 5, which handles errors in async handlers and removes the per-handler `try/catch`
-- [ ] Custom hooks to share data-fetching logic in the web app
-- [ ] Code-split MapLibre to shrink the initial bundle
-- [ ] A more realistic dataset: real photos and coordinates on land, matching each address
 
 ## 👤 Author
 
