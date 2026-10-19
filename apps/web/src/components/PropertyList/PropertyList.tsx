@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router';
-import { formatDistanceToNow } from 'date-fns';
-import { es } from 'date-fns/locale';
 import { DEFAULT_PAGE_SIZE, type Property } from '@red-atlas/shared';
 import { setProperties } from '../../redux/propertiesSlice';
 import defaultImage from '../../assets/property-default.jpg';
 import PropertyCardSkeleton from './PropertyCardSkeleton';
 import './PropertyList.scss';
 import { API_URL } from '../../lib/api';
+import { formatTimeAgo } from '../../lib/format';
 import { PROPERTY_STATUS_LABELS, PROPERTY_TYPE_LABELS } from '../../lib/labels';
 
 export default function PropertyList() {
@@ -116,11 +115,7 @@ export default function PropertyList() {
                   </div>
                   <p className='createdAt'>
                     Publicada{' '}
-                    {property.createdAt &&
-                      formatDistanceToNow(new Date(property.createdAt), {
-                        addSuffix: true,
-                        locale: es,
-                      })}
+                    {property.createdAt && formatTimeAgo(property.createdAt)}
                   </p>
                 </div>
               </NavLink>
