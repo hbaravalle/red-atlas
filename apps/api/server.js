@@ -20,5 +20,6 @@ app.get('*', function (req, res) {
 });
 
 app.listen(PORT, () => {
-  console.log(`[Server] API running at http://localhost:${PORT}/api/properties`);
+  console.log(`[Server] Listening on http://localhost:${PORT}`);
+  console.log(`[Server] Properties: http://localhost:${PORT}/api/properties`);
 });
