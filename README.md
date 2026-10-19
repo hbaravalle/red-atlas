@@ -141,6 +141,7 @@ pnpm dev
 | `pnpm lint` | Lint the web app |
 | `pnpm migrate` | Apply pending database migrations |
 | `pnpm seed` | Replace the table contents with the 10,000-property dataset |
+| `pnpm migrate:prod` / `pnpm seed:prod` | The same against production, using `apps/api/.env.production.local` |
 
 ## ☁️ Deployment
 
@@ -153,7 +154,14 @@ Both apps deploy to Vercel as two projects from this repository:
 
 Vercel installs from the workspace root, so both apps resolve `@red-atlas/shared`. Pushes to `main` deploy to production; any other branch gets a preview URL.
 
-Migrations are not run on deploy. Before shipping a schema change, run `pnpm migrate` with `DATABASE_URL` pointing at the production branch.
+Each environment has its own database, through Neon branches:
+
+| Where | `DATABASE_URL` points at |
+|---|---|
+| Local (`apps/api/.env`) and Vercel **Preview** | Neon `dev` branch |
+| Vercel **Production** and `apps/api/.env.production.local` | Neon `main` branch |
+
+Migrations are not run on deploy. Before merging a schema change to `main`, run `pnpm migrate:prod`.
 
 ## 👤 Author
 

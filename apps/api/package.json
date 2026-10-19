@@ -8,7 +8,9 @@
     "start": "node server.js",
     "seed": "node seeders/propertySeeder.js",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "db:migrate:prod": "DOTENV_CONFIG_PATH=.env.production.local drizzle-kit migrate",
+    "seed:prod": "DOTENV_CONFIG_PATH=.env.production.local node seeders/propertySeeder.js"
   },
   "keywords": [],
   "author": "",

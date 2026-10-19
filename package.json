@@ -13,7 +13,9 @@
     "build": "pnpm --filter web build",
     "lint": "pnpm --filter web lint",
     "seed": "pnpm --filter api seed",
-    "migrate": "pnpm --filter api db:migrate"
+    "migrate": "pnpm --filter api db:migrate",
+    "migrate:prod": "pnpm --filter api db:migrate:prod",
+    "seed:prod": "pnpm --filter api seed:prod"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
