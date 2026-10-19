@@ -1,6 +1,6 @@
 # Red Atlas — Web app
 
-React 18 + TypeScript front end for Red Atlas: property list with pagination and sorting, MapLibre map (OpenFreeMap tiles, no API key), search, detail modal and create form.
+React 18 + TypeScript front end for Red Atlas: property list with pagination, sorting and loading skeletons, MapLibre map (OpenFreeMap tiles, no API key), search, a property detail modal with a location map, and a create form.
 
 See the [main README](../../README.md) for the full project, architecture and setup.
 
@@ -16,7 +16,7 @@ pnpm dev:web
 ```
 src/
 ├── components/   # InteractiveMap, ModalCreate, ModalDetail, Nav, PropertyList
-├── lib/          # API base URL, UI labels for shared domain values
+├── lib/          # API base URL, MapLibre setup, number and date formats, UI labels
 ├── redux/        # Store, properties & modal slices
 └── types/        # App-only types (modal state)
 ```

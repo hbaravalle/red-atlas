@@ -10,7 +10,9 @@ A responsive real estate app to browse, search and publish property listings on 
 ![MapLibre](https://img.shields.io/badge/MapLibre_GL-396CB2?style=flat-square&logo=maplibre&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-000000?style=flat-square&logo=express&logoColor=white)
-![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![Neon](https://img.shields.io/badge/Neon-00E599?style=flat-square&logo=neon&logoColor=black)
+![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-C5F74F?style=flat-square&logo=drizzle&logoColor=black)
 ![pnpm](https://img.shields.io/badge/pnpm_workspaces-F69220?style=flat-square&logo=pnpm&logoColor=white)
 
 <!-- TIP: add a screenshot or GIF here, e.g. ![Red Atlas](./docs/demo.gif) -->
@@ -23,26 +25,37 @@ Build a front end to list, manage and locate real estate properties: React + Typ
 
 Sorting, paginating and searching 10,000 records in the browser means downloading all of them up front and doing the heavy lifting on the user's device — slow on first load and worse on phones.
 
-So I moved that work to the server. I designed a small REST API with Node.js, Express and MongoDB Atlas that handles **pagination, sorting and text search** and returns exactly one page at a time, with the metadata the UI needs (`totalPages`, `prevPage`, `nextPage`). The front end stays thin: it asks for a page and renders it.
+So I moved that work to the server. I designed a small REST API with Node.js, Express and Postgres that handles **pagination, sorting and text search** and returns exactly one page at a time, with the metadata the UI needs (`totalPages`, `prevPage`, `nextPage`). The front end stays thin: it asks for a page and renders it.
 
 This repo keeps both halves together, so the whole story — and the contract between them — lives in one place.
+
+## From MongoDB to Postgres
+
+The API first ran on MongoDB Atlas with Mongoose. I later moved it to **Postgres on [Neon](https://neon.com)** with **[Drizzle ORM](https://orm.drizzle.team)**, without changing the API contract, so the web app did not have to change.
+
+- **The data is relational and fixed in shape.** Every property has the same fields, so a table with typed columns and constraints fits better than documents.
+- **The database enforces the rules.** `NOT NULL` and `CHECK` constraints reject bad data no matter where it comes from, not only requests that go through the app.
+- **Exact numbers where they matter.** Price and area are stored as `numeric`, so price per square foot is never off by a rounding error.
+- **Built for serverless.** Neon's HTTP driver sends each query as a request, so there are no connections to open or leak from Vercel functions, and the database scales to zero when the demo is idle.
+- **Versioned migrations.** Drizzle generates the SQL for each schema change, so the database history lives in the repo next to the code.
 
 ## ✨ Features
 
 **Web app** (`apps/web`)
-- Property list with server-side pagination and sorting by date or price
-- Interactive map (MapLibre GL + free OpenStreetMap tiles from OpenFreeMap, no API key) with a marker for every listed property
-- Search by title or address, resolved by the API
-- Property detail as a routed modal (`/detail/:id`), so every property has a shareable URL
+- Property list with server-side pagination, sorting by date or price, and skeleton cards while a page loads
+- Interactive map (MapLibre GL + free OpenStreetMap tiles from OpenFreeMap, no API key) with a marker for every listed property, framed on Puerto Rico in the area the panels leave visible
+- Search by title or address, resolved by the API, with a clear button and keyboard support
+- Property detail as a routed modal (`/detail/:id`), so every property has a shareable URL: photo, location map, key facts including price per square foot, description and owner contact
 - Create a property (`/create`) with a form validated by React Hook Form
 - Toast feedback and a fully responsive layout
 
 **API** (`apps/api`)
-- Paginated listing with navigation metadata
-- Sorting by newest, price ascending or price descending
-- Case-insensitive search across title and address
-- Create and delete endpoints, plus a seeder with sample data
-- Serverless deployment on Vercel, database on MongoDB Atlas
+- Paginated listing with navigation metadata, with page size capped at 100
+- Sorting by newest, price ascending or price descending, with a tiebreaker so pages stay stable
+- Case-insensitive search across title and address, with `%` and `_` matched literally
+- Create and delete endpoints that answer `400` for invalid data and `404` for unknown ids
+- Batched seeder that loads the 10,000-property dataset
+- Serverless deployment on Vercel, database on Neon
 
 ## 🧱 Architecture
 
@@ -50,7 +63,7 @@ This repo keeps both halves together, so the whole story — and the contract be
 red-atlas/
 ├── apps/
 │   ├── web/          # React 18 + TypeScript + Vite + Redux Toolkit + MapLibre
-│   └── api/          # Node.js + Express + Mongoose
+│   └── api/          # Node.js + Express + Drizzle ORM + Neon Postgres
 ├── packages/
 │   └── shared/       # Property domain shared by both apps
 └── pnpm-workspace.yaml
@@ -58,10 +71,12 @@ red-atlas/
 
 **One source of truth for the domain.** `@red-atlas/shared` defines the property types (`apartment`, `house`, `office`, `land`), statuses (`sale`, `rent`), sort options and page size, plus the TypeScript types for a `Property` and the paginated response.
 
-- The **API** uses those values as its Mongoose enums, so it rejects anything outside them.
+- The **API** validates requests against those values and turns them into `CHECK` constraints in the database, so nothing outside them can be stored.
 - The **web app** uses the same values for its types and UI labels. The label maps are typed as `Record<PropertyType, string>`, so adding a new property type to the shared package makes TypeScript flag every place in the UI that needs a label.
 
 The package is plain JavaScript with hand-written type declarations, so the API runs on Node without a build step and the web app still gets full types.
+
+**Layers in the API.** Routes map URLs to the controller, which only deals with HTTP: reading the request, validating it and choosing the status code. Every query lives in the model (`models/Property.js`), next to the Drizzle table definition and the mapping between table rows and the JSON the web app expects.
 
 **State and routing.** Redux Toolkit holds the property list and modal state. Routes drive the modals, so the browser's back button works as users expect.
 
@@ -83,9 +98,11 @@ Query parameters for listing and search:
 | Param | Default | Description |
 |---|---|---|
 | `page` | `1` | Page number |
-| `limit` | `10` | Items per page |
+| `limit` | `10` | Items per page, up to `100` |
 | `sort` | newest first | `price_asc` or `price_desc` |
 | `query` | — | **Required for `/search`**: text to match in title or address |
+
+Invalid `page` or `limit` values fall back to the defaults. `POST /properties` answers `400` with a message when the data breaks a rule (a missing required field, an unknown `type` or `status`), and `GET` and `DELETE /properties/:id` answer `404` when no property has that id.
 
 ```bash
 curl "https://api-red-atlas-livid.vercel.app/api/properties/search?query=suite&sort=price_asc&limit=5"
@@ -93,7 +110,7 @@ curl "https://api-red-atlas-livid.vercel.app/api/properties/search?query=suite&s
 
 ## 🚀 Running locally
 
-**Prerequisites:** Node.js 20+, [pnpm](https://pnpm.io/installation), a MongoDB connection string ([Atlas](https://www.mongodb.com/atlas) free tier works). The map needs no API key.
+**Prerequisites:** Node.js 20+, [pnpm](https://pnpm.io/installation) and a Postgres connection string. A [Neon](https://neon.com) free project works; a separate Neon branch for development keeps production data untouched. The map needs no API key.
 
 ```bash
 git clone https://github.com/hbaravalle/red-atlas.git
@@ -101,10 +118,11 @@ cd red-atlas
 pnpm install
 
 # Environment variables
-cp apps/api/.env.example apps/api/.env   # set DB_CONNECTION
+cp apps/api/.env.example apps/api/.env   # set DATABASE_URL
 cp apps/web/.env.example apps/web/.env   # optional: VITE_API_URL
 
-# Load sample data (optional)
+# Create the table, then load the 10,000 properties
+pnpm migrate
 pnpm seed
 
 # Run the API (localhost:3000) and the web app (localhost:5173) together
@@ -119,7 +137,8 @@ pnpm dev
 | `pnpm dev:web` / `pnpm dev:api` | Run one app |
 | `pnpm build` | Type-check and build the web app |
 | `pnpm lint` | Lint the web app |
-| `pnpm seed` | Seed MongoDB with sample properties |
+| `pnpm migrate` | Apply pending database migrations |
+| `pnpm seed` | Replace the table contents with the 10,000-property dataset |
 
 ## ☁️ Deployment
 
@@ -128,15 +147,19 @@ Both apps deploy to Vercel as two projects from this repository:
 | Project | Root directory | Notes |
 |---|---|---|
 | Web | `apps/web` | Framework preset: Vite. No env vars required |
-| API | `apps/api` | Uses `apps/api/vercel.json`. Env: `DB_CONNECTION` |
+| API | `apps/api` | Uses `apps/api/vercel.json`. Env: `DATABASE_URL` (Neon `main` branch) |
+
+Migrations are not run on deploy. Before shipping a schema change, run `pnpm migrate` with `DATABASE_URL` pointing at the production branch.
 
 ## 🗺️ Roadmap
 
 - [ ] Edit-property form and `PUT /properties/:id` (route reserved, handler pending)
 - [ ] Advanced filters (type, status, price range) on both API and UI
-- [ ] Request validation and consistent error responses in the API
+- [ ] Schema-based request validation (for example with Zod) and one error format across the API
+- [ ] Express 5, which handles errors in async handlers and removes the per-handler `try/catch`
 - [ ] Custom hooks to share data-fetching logic in the web app
 - [ ] Code-split MapLibre to shrink the initial bundle
+- [ ] A more realistic dataset: real photos and coordinates on land, matching each address
 
 ## 👤 Author
 

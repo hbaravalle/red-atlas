@@ -13,7 +13,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "Properties REST API for Red Atlas: pagination, sorting and search over MongoDB.",
+  "description": "Properties REST API for Red Atlas: pagination, sorting and search over Postgres on Neon.",
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
     "@red-atlas/shared": "workspace:*",
