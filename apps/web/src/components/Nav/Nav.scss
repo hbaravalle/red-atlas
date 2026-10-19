@@ -38,12 +38,38 @@ header {
       form {
         width: 100%;
         display: flex;
+        align-items: center;
         gap: 10px;
 
         input[name='query'] {
           width: 100%;
           border: none;
           padding: 5px;
+        }
+
+        .clear {
+          display: flex;
+          flex-shrink: 0;
+          padding: 3px;
+          background: none;
+          border: none;
+          border-radius: 50%;
+          color: #6b6b6b;
+          cursor: pointer;
+
+          &:hover {
+            background-color: #f2f2f2;
+            color: #000;
+          }
+
+          &:focus-visible {
+            outline: 2px solid #000;
+          }
+
+          svg {
+            width: 18px;
+            height: 18px;
+          }
         }
       }
     }
@@ -69,6 +95,30 @@ header {
 
         &:not(.result:last-child) {
           border-bottom: 1px solid #eaeaea;
+        }
+
+        // Only the results are links; the "at least 3 characters" hint is not
+        &:is(a) {
+          transition: background-color 120ms ease;
+
+          &:hover {
+            background-color: #f4f4f4;
+
+            .title {
+              text-decoration: underline;
+            }
+          }
+
+          // Same highlight for keyboard users, plus a ring to show focus
+          &:focus-visible {
+            background-color: #f4f4f4;
+            outline: 2px solid #000;
+            outline-offset: -2px;
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            transition: none;
+          }
         }
 
         img {
