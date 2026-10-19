@@ -1,6 +1,6 @@
 # Red Atlas — API
 
-Express REST API for Red Atlas, with pagination, sorting and text search over Postgres on [Neon](https://neon.com), queried with [Drizzle ORM](https://orm.drizzle.team). Deployed on Vercel at `https://api-red-atlas-livid.vercel.app/api`.
+Express REST API for Red Atlas, with pagination, sorting and text search over Postgres on [Neon](https://neon.com), queried with [Drizzle ORM](https://orm.drizzle.team). Deployed on Vercel at `https://red-atlas-api.vercel.app/api`.
 
 See the [main README](../../README.md) for the endpoints, the reasoning behind the API and setup.
 

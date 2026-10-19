@@ -2,7 +2,7 @@
 
 A responsive real estate app to browse, search and publish property listings on an interactive map — with the REST API I designed to power it. Built as my solution to the **Red Atlas Front-End Challenge**.
 
-**🚀 [Live demo](https://mid-frontend-challenge.vercel.app/)** · **🔌 [API](https://api-red-atlas-livid.vercel.app/api/properties)**
+**🚀 [Live demo](https://red-atlas-web.vercel.app/)** · **🔌 [API](https://red-atlas-api.vercel.app/api/properties)**
 
 ![React](https://img.shields.io/badge/React_18-20232A?style=flat-square&logo=react&logoColor=61DAFB)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
@@ -84,7 +84,7 @@ The package is plain JavaScript with hand-written type declarations, so the API 
 
 ## 📖 API reference
 
-Base URL: `https://api-red-atlas-livid.vercel.app/api`
+Base URL: `https://red-atlas-api.vercel.app/api`
 
 | Method | Route | Description |
 |---|---|---|
@@ -107,7 +107,7 @@ Query parameters for listing and search:
 Invalid `page` or `limit` values fall back to the defaults. `POST /properties` answers `400` with a message when the data breaks a rule (a missing required field, an unknown `type` or `status`), and `GET` and `DELETE /properties/:id` answer `404` when no property has that id.
 
 ```bash
-curl "https://api-red-atlas-livid.vercel.app/api/properties/search?query=suite&sort=price_asc&limit=5"
+curl "https://red-atlas-api.vercel.app/api/properties/search?query=suite&sort=price_asc&limit=5"
 ```
 
 ## 🚀 Running locally
