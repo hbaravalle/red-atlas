@@ -18,8 +18,26 @@ app.use(express.static('public'));
 
 app.use('/api/properties', propertiesRoutes);
 
-app.get('*', function (req, res) {
+app.use(function (req, res) {
   return res.status(404).json('Not found');
+});
+
+// Postgres errors caused by bad input (not null, check, bad text, out of range)
+const INVALID_DATA_CODES = ['23502', '23514', '22P02', '22003'];
+
+// Express 5 sends errors from async handlers here
+app.use(function (error, req, res, next) {
+  if (INVALID_DATA_CODES.includes(error.cause?.code)) {
+    return res.status(400).json({ message: error.cause.message });
+  }
+
+  // Malformed JSON, rejected by express.json()
+  if (error.type === 'entity.parse.failed') {
+    return res.status(400).json({ message: 'Invalid JSON body' });
+  }
+
+  console.error(error);
+  return res.status(500).json('Server error');
 });
 
 // On Vercel the exported app runs as a function and Vercel handles the port;
