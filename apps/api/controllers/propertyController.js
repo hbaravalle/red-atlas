@@ -111,8 +111,6 @@ async function create(req, res) {
   return res.status(201).json(newProperty);
 }
 
-async function update(req, res) {}
-
 async function destroy(req, res) {
   const deleted = await Property.destroy(req.params.id);
 
@@ -123,4 +121,4 @@ async function destroy(req, res) {
   return res.json('Property deleted');
 }
 
-export default { getAll, getById, search, count, create, update, destroy };
+export default { getAll, getById, search, count, create, destroy };
