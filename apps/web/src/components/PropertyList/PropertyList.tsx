@@ -37,18 +37,18 @@ export default function PropertyList() {
     <div id='propertyList'>
       <div className='container'>
         <div className='header'>
-          <h1>Propiedades</h1>
+          <h1>Properties</h1>
           <form>
-            Filtrar por
+            Sort by
             <select
               name='filter'
               id='filter'
               onChange={handleSortChange}
               value={sort}
             >
-              <option value='date'>Fecha de publicación</option>
-              <option value='price_asc'>Precio, de menor a mayor</option>
-              <option value='price_desc'>Precio, de mayor a menor</option>
+              <option value='date'>Newest first</option>
+              <option value='price_asc'>Price, low to high</option>
+              <option value='price_desc'>Price, high to low</option>
             </select>
           </form>
         </div>
@@ -56,7 +56,7 @@ export default function PropertyList() {
           {isFetching ? (
             <>
               <p className='visually-hidden' role='status'>
-                Cargando propiedades...
+                Loading properties...
               </p>
               {Array.from({ length: DEFAULT_PAGE_SIZE }, (_, index) => (
                 <PropertyCardSkeleton key={index} />
@@ -64,9 +64,9 @@ export default function PropertyList() {
             </>
           ) : isError ? (
             <div className='list-error' role='alert'>
-              <p>No pudimos cargar las propiedades.</p>
+              <p>We couldn't load the properties.</p>
               <button type='button' onClick={refetch}>
-                Reintentar
+                Try again
               </button>
             </div>
           ) : (
@@ -86,7 +86,7 @@ export default function PropertyList() {
                       {PROPERTY_TYPE_LABELS[property.type]}
                     </span>
                     <span className='isActive'>
-                      {property.isActive ? 'Activo' : 'Inactivo'}
+                      {property.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </div>
                 </figure>
@@ -95,10 +95,10 @@ export default function PropertyList() {
                   <p className='address'>{property.address}</p>
                   <div className='numbers'>
                     <p className='price'>${property.price}</p>
-                    <p className='area'>{property.area} pie²</p>
+                    <p className='area'>{property.area} sq ft</p>
                   </div>
                   <p className='createdAt'>
-                    Publicada{' '}
+                    Listed{' '}
                     {property.createdAt && formatTimeAgo(property.createdAt)}
                   </p>
                 </div>
@@ -113,20 +113,20 @@ export default function PropertyList() {
             disabled={page <= 1}
             onClick={() => handlePageChange(page - 1)}
           >
-            Anterior
+            Previous
           </button>
           <span>
-            Página {page} de {totalPages}
+            Page {page} of {totalPages}
           </span>
           <button
             disabled={page >= totalPages}
             onClick={() => handlePageChange(page + 1)}
           >
-            Siguiente
+            Next
           </button>
         </div>
         <NavLink to='/create' className='create'>
-          + Crear
+          + Add
         </NavLink>
       </div>
     </div>

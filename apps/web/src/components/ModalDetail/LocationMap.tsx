@@ -32,7 +32,7 @@ export default function LocationMap({ lat, lng }: LocationMapProps) {
       ref={containerRef}
       className='location-map'
       role='img'
-      aria-label='Ubicación de la propiedad en el mapa'
+      aria-label='Property location on the map'
     />
   );
 }

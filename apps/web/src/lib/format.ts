@@ -1,7 +1,6 @@
 import { formatDistanceToNowStrict } from 'date-fns';
-import { es } from 'date-fns/locale';
 
-const LOCALE = 'es-PR';
+const LOCALE = 'en-US';
 
 const priceFormat = new Intl.NumberFormat(LOCALE, {
   style: 'currency',
@@ -19,11 +18,11 @@ const areaFormat = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 2 });
 
 export const formatPrice = (price: number) => priceFormat.format(price);
 
-export const formatArea = (area: number) => `${areaFormat.format(area)} pie²`;
+export const formatArea = (area: number) => `${areaFormat.format(area)} sq ft`;
 
 export const formatPricePerArea = (price: number, area: number) =>
-  `${pricePerAreaFormat.format(price / area)}/pie²`;
+  `${pricePerAreaFormat.format(price / area)}/sq ft`;
 
-// Strict: "hace 2 años", not "hace casi 2 años"
+// Strict: "2 years ago", not "about 2 years ago"
 export const formatTimeAgo = (date: string) =>
-  formatDistanceToNowStrict(new Date(date), { addSuffix: true, locale: es });
+  formatDistanceToNowStrict(new Date(date), { addSuffix: true });

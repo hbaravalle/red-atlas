@@ -52,7 +52,7 @@ export default function Nav() {
       <nav ref={navRef}>
         <NavLink to='/' className='logo'>
           {/* Absolute path, so it also loads on /detail/:id */}
-          <img src='/logo.svg' alt='Logo Red Atlas' />
+          <img src='/logo.svg' alt='Red Atlas logo' />
         </NavLink>
         <div className='search'>
           {/* Results update while typing; Enter must not reload the page */}
@@ -63,8 +63,8 @@ export default function Nav() {
               {...register('query')}
               id='search'
               autoComplete='off'
-              placeholder='Buscar propiedades por título o dirección'
-              aria-label='Buscar propiedades'
+              placeholder='Search properties by title or address'
+              aria-label='Search properties'
               onFocus={() => setIsOpen(true)}
               onInput={() => setIsOpen(true)}
               onKeyDown={(event) => {
@@ -76,7 +76,7 @@ export default function Nav() {
                 type='button'
                 className='clear'
                 onClick={clearSearch}
-                aria-label='Borrar búsqueda'
+                aria-label='Clear search'
               >
                 <X />
               </button>
@@ -86,7 +86,7 @@ export default function Nav() {
         <div className='search-results' hidden={!isOpen}>
           {query.length === 0 && ''}
           {query.length > 0 && query.length < 3 ? (
-            <div className='result'>Ingrese al menos 3 caracteres</div>
+            <div className='result'>Type at least 3 characters</div>
           ) : (
             results.map((property: Property) => (
               <NavLink
@@ -105,12 +105,12 @@ export default function Nav() {
                       {PROPERTY_TYPE_LABELS[property.type]}
                     </span>
                     <span className='isActive'>
-                      {property.isActive ? 'Activo' : 'Inactivo'}
+                      {property.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </div>
                   <div className='numbers'>
                     <p className='price'>${property.price}</p>
-                    <p className='area'>{property.area} pie²</p>
+                    <p className='area'>{property.area} sq ft</p>
                   </div>
                 </div>
               </NavLink>

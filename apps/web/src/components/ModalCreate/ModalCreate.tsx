@@ -70,13 +70,13 @@ export default function ModalCreate() {
     try {
       // The mutation invalidates the cached lists, so the list reloads itself
       await createProperty(data).unwrap();
-      toast.success('Propiedad creada exitosamente');
+      toast.success('Property created');
       handleClose();
     } catch (error) {
       // A 400 carries the API's reason
       const reason =
         isQueryError(error) && error.status === 400 ? `: ${error.message}` : '';
-      toast.error(`Error al crear la propiedad${reason}`);
+      toast.error(`Couldn't create the property${reason}`);
     }
   };
 
@@ -90,12 +90,12 @@ export default function ModalCreate() {
         onClick={handleModalClick}
       >
         <header className='topbar'>
-          <h2 id='create-title'>Nueva propiedad</h2>
+          <h2 id='create-title'>New property</h2>
           <button
             type='button'
             className='close'
             onClick={handleClose}
-            aria-label='Cerrar'
+            aria-label='Close'
           >
             <X />
           </button>
@@ -104,11 +104,11 @@ export default function ModalCreate() {
           {/* Only the fields scroll */}
           <div className='fields'>
             <div className='form-group'>
-              <label htmlFor='title'>Título</label>
+              <label htmlFor='title'>Title</label>
               <input
                 id='title'
                 type='text'
-                {...register('title', { required: 'El título es obligatorio' })}
+                {...register('title', { required: 'Title is required' })}
               />
               {errors.title && (
                 <span className='error'>{errors.title.message}</span>
@@ -116,12 +116,12 @@ export default function ModalCreate() {
             </div>
 
             <div className='form-group'>
-              <label htmlFor='address'>Dirección</label>
+              <label htmlFor='address'>Address</label>
               <input
                 id='address'
                 type='text'
                 {...register('address', {
-                  required: 'La dirección es obligatoria',
+                  required: 'Address is required',
                 })}
               />
               {errors.address && (
@@ -130,12 +130,12 @@ export default function ModalCreate() {
             </div>
 
             <div className='form-group'>
-              <label htmlFor='price'>Precio</label>
+              <label htmlFor='price'>Price</label>
               <input
                 id='price'
                 type='number'
                 {...register('price', {
-                  required: 'El precio es obligatorio',
+                  required: 'Price is required',
                 })}
               />
               {errors.price && (
@@ -144,7 +144,7 @@ export default function ModalCreate() {
             </div>
 
             <div className='form-group'>
-              <label htmlFor='description'>Descripción</label>
+              <label htmlFor='description'>Description</label>
               <textarea id='description' {...register('description')}></textarea>
               {errors.description && (
                 <span className='error'>{errors.description.message}</span>
@@ -153,28 +153,38 @@ export default function ModalCreate() {
 
             <div style={{ display: 'flex', gap: 20 }}>
               <div className='form-group'>
-                <label htmlFor='latitude'>Latitud</label>
+                <label htmlFor='latitude'>Latitude</label>
                 <input
                   id='latitude'
                   type='number'
                   step='any'
-                  {...register('location.lat', {})}
+                  {...register('location.lat', {
+                    required: 'Latitude is required',
+                  })}
                 />
+                {errors.location?.lat && (
+                  <span className='error'>{errors.location.lat.message}</span>
+                )}
               </div>
 
               <div className='form-group'>
-                <label htmlFor='longitude'>Longitud</label>
+                <label htmlFor='longitude'>Longitude</label>
                 <input
                   id='longitude'
                   type='number'
                   step='any'
-                  {...register('location.lng', {})}
+                  {...register('location.lng', {
+                    required: 'Longitude is required',
+                  })}
                 />
+                {errors.location?.lng && (
+                  <span className='error'>{errors.location.lng.message}</span>
+                )}
               </div>
             </div>
 
             <div className='form-group'>
-              <label htmlFor='image'>Link de la imagen</label>
+              <label htmlFor='image'>Image URL</label>
               <input
                 id='image'
                 type='text'
@@ -185,12 +195,12 @@ export default function ModalCreate() {
             </div>
 
             <div className='form-group'>
-              <label htmlFor='area'>Área</label>
+              <label htmlFor='area'>Area (sq ft)</label>
               <input id='area' type='text' {...register('area')} />
             </div>
 
             <div className='form-group'>
-              <label>Tipo de propiedad</label>
+              <label>Property type</label>
               <div className='radiobtn-group'>
                 {/* One option per shared type */}
                 {PROPERTY_TYPES.map((type) => (
@@ -200,7 +210,7 @@ export default function ModalCreate() {
                       type='radio'
                       value={type}
                       {...register('type', {
-                        required: 'El tipo de propiedad es obligatorio',
+                        required: 'Property type is required',
                       })}
                     />
                     {PROPERTY_TYPE_LABELS[type]}
@@ -213,7 +223,7 @@ export default function ModalCreate() {
             </div>
 
             <div className='form-group'>
-              <label>Operación</label>
+              <label>Listing</label>
               <div className='radiobtn-group'>
                 {PROPERTY_STATUSES.map((status) => (
                   <label htmlFor={`status-${status}`} key={status}>
@@ -222,7 +232,7 @@ export default function ModalCreate() {
                       type='radio'
                       value={status}
                       {...register('status', {
-                        required: 'La operación es obligatoria',
+                        required: 'Listing is required',
                       })}
                     />
                     {PROPERTY_STATUS_LABELS[status]}
@@ -238,11 +248,11 @@ export default function ModalCreate() {
 
           <footer className='actions'>
             <button type='button' className='cancel' onClick={handleClose}>
-              Cancelar
+              Cancel
             </button>
             {/* Disabled while saving, so a double click creates only one */}
             <button type='submit' disabled={isSaving}>
-              {isSaving ? 'Creando...' : 'Crear propiedad'}
+              {isSaving ? 'Creating...' : 'Create property'}
             </button>
           </footer>
         </form>

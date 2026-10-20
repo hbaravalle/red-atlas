@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, useNavigate, useParams } from 'react-router';
 import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, MapPin, X } from 'react-feather';
 import type { Property } from '@red-atlas/shared';
 import {
@@ -26,7 +25,7 @@ type LoadState =
   | { status: 'not-found' }
   | { status: 'error' };
 
-// Longer descriptions start collapsed behind "Leer más"
+// Longer descriptions start collapsed behind "Read more"
 const DESCRIPTION_PREVIEW_LENGTH = 280;
 
 export default function ModalDetail() {
@@ -77,12 +76,12 @@ export default function ModalDetail() {
         onClick={(event) => event.stopPropagation()}
       >
         <header className='topbar'>
-          <span>Ficha de la propiedad</span>
+          <span>Property details</span>
           <button
             type='button'
             className='close'
             onClick={handleClose}
-            aria-label='Cerrar'
+            aria-label='Close'
           >
             <X />
           </button>
@@ -90,13 +89,13 @@ export default function ModalDetail() {
 
         {state.status === 'loading' && <DetailSkeleton />}
         {state.status === 'not-found' && (
-          <Feedback message='Esta propiedad no existe o fue eliminada.' />
+          <Feedback message="This property doesn't exist or was deleted." />
         )}
         {state.status === 'error' && (
-          <Feedback message='No pudimos cargar la propiedad. Probá de nuevo en unos segundos.' />
+          <Feedback message="We couldn't load the property. Try again in a few seconds." />
         )}
         {state.status === 'ready' && (
-          // The key resets the gallery and "Leer más"
+          // The key resets the gallery and "Read more"
           <PropertyDetail key={state.property._id} property={state.property} />
         )}
       </article>
@@ -109,7 +108,7 @@ function DetailSkeleton() {
   return (
     <>
       <p className='visually-hidden' role='status'>
-        Cargando propiedad...
+        Loading property...
       </p>
       <div className='content skeleton' aria-hidden='true'>
         <section className='heading'>
@@ -146,7 +145,7 @@ function Feedback({ message }: { message: string }) {
   return (
     <div className='feedback'>
       <p>{message}</p>
-      <NavLink to='/'>Volver al listado</NavLink>
+      <NavLink to='/'>Back to the list</NavLink>
     </div>
   );
 }
@@ -155,16 +154,16 @@ function PropertyDetail({ property }: { property: Property }) {
   const { title, address, location, price, area, owner } = property;
 
   const stats = [
-    { label: 'Precio', value: formatPrice(price) },
-    { label: 'Superficie', value: area ? formatArea(area) : '—' },
+    { label: 'Price', value: formatPrice(price) },
+    { label: 'Area', value: area ? formatArea(area) : '—' },
     {
-      label: 'Precio por pie²',
+      label: 'Price per sq ft',
       value: area ? formatPricePerArea(price, area) : '—',
     },
-    { label: 'Tipo', value: PROPERTY_TYPE_LABELS[property.type] },
-    { label: 'Operación', value: PROPERTY_STATUS_LABELS[property.status] },
+    { label: 'Type', value: PROPERTY_TYPE_LABELS[property.type] },
+    { label: 'Listing', value: PROPERTY_STATUS_LABELS[property.status] },
     {
-      label: 'Publicada',
+      label: 'Listed',
       value: formatTimeAgo(property.createdAt),
     },
   ];
@@ -176,7 +175,7 @@ function PropertyDetail({ property }: { property: Property }) {
           <span>{PROPERTY_STATUS_LABELS[property.status]}</span>
           <span>{PROPERTY_TYPE_LABELS[property.type]}</span>
           <span className={property.isActive ? '' : 'inactive'}>
-            {property.isActive ? 'Activa' : 'Inactiva'}
+            {property.isActive ? 'Active' : 'Inactive'}
           </span>
         </div>
         <h2 id='property-title'>{title}</h2>
@@ -211,7 +210,7 @@ function PropertyDetail({ property }: { property: Property }) {
 
       {(owner?.name || owner?.contact) && (
         <section className='card contact'>
-          <h3>Contacto</h3>
+          <h3>Contact</h3>
           {owner.name && <p className='name'>{owner.name}</p>}
           {owner.contact &&
             (owner.contact.includes('@') ? (
@@ -235,14 +234,14 @@ function Gallery({ images, title }: { images: string[]; title: string }) {
 
   return (
     <figure className='gallery'>
-      <img src={photos[index]} alt={`Foto ${index + 1} de ${title}`} />
+      <img src={photos[index]} alt={`Photo ${index + 1} of ${title}`} />
       {hasMany && (
         <>
           <button
             type='button'
             className='prev'
             onClick={() => move(-1)}
-            aria-label='Foto anterior'
+            aria-label='Previous photo'
           >
             <ChevronLeft />
           </button>
@@ -250,7 +249,7 @@ function Gallery({ images, title }: { images: string[]; title: string }) {
             type='button'
             className='next'
             onClick={() => move(1)}
-            aria-label='Foto siguiente'
+            aria-label='Next photo'
           >
             <ChevronRight />
           </button>
@@ -274,10 +273,8 @@ function Description({ text, updatedAt }: { text: string; updatedAt: string }) {
   return (
     <section className='card description'>
       <div className='card-heading'>
-        <h3>Descripción</h3>
-        <span>
-          Actualizada el{' '}
-          {format(new Date(updatedAt), "d 'de' MMMM 'de' yyyy", { locale: es })}
+        <h3>Description</h3>
+        <span>Updated {format(new Date(updatedAt), 'MMMM d, yyyy')}
         </span>
       </div>
       <p>{visible}</p>
@@ -287,7 +284,7 @@ function Description({ text, updatedAt }: { text: string; updatedAt: string }) {
           className='link'
           onClick={() => setExpanded((value) => !value)}
         >
-          {expanded ? 'Leer menos' : 'Leer más'}
+          {expanded ? 'Read less' : 'Read more'}
         </button>
       )}
     </section>
