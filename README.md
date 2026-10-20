@@ -23,6 +23,28 @@ Build a front end to list, manage and locate real estate properties: React + Typ
 
 The challenge only required the front end. Building a back end to serve the data was listed as an **optional extra**, one that Red Atlas said would add value to the solution.
 
+## 🧑‍💻 User stories
+
+- As a house hunter, I want to **browse listings page by page**, sorted by newest or by price, so I can scan 10,000 properties without waiting for all of them to load.
+- As a house hunter, I want to **see the listed properties on a map**, so I understand where each one is.
+- As a house hunter, I want to **search by title or address** and jump straight to a match.
+- As a house hunter, I want to **open a property's detail**: photo, location, price per square foot, description and owner contact, so I can decide whether to get in touch.
+- As a house hunter, I want **every property to have its own URL**, so I can share it or come back to it, and close it with the browser's back button.
+- As an owner or agent, I want to **publish a new property** with a form that tells me what's missing before I submit it.
+- As a developer, I want a **documented REST API** with pagination, sorting and search, so another client can use the same data.
+
+## Design & interaction
+
+**The map frames what you can actually see.** The list and the panels cover part of the screen, so centering the map on Puerto Rico would hide half the island behind them. The map measures the space they leave free and fits the island inside it. When the panels would leave too little room, as on small screens, it ignores them and uses the whole map.
+
+**Loading looks like the content.** While a page of properties or a detail loads, skeleton cards with the same layout take its place, so the screen doesn't jump when the data arrives.
+
+**Every view has a URL.** The property detail and the create form are routed modals (`/detail/:id`, `/create`). A property can be shared or bookmarked, the browser's back button closes the modal, and Escape does too.
+
+**A search that guides you.** Results appear as you type, the search asks for at least three characters before querying, and it closes when you click outside it. Escape or the clear button empties it and keeps the focus in the input, so you can type the next search right away.
+
+**Errors that say what to fix.** The create form checks every field before sending anything, and each problem shows up next to its field. If the API still rejects the data, the toast shows the API's own reason instead of a generic "something went wrong".
+
 ## The key decision: build my own API
 
 I took on that extra because the dataset made the case for it. Sorting, paginating and searching 10,000 records in the browser means downloading all of them up front and doing the heavy lifting on the user's device — slow on first load and worse on phones.
@@ -165,5 +187,5 @@ Migrations are not run on deploy. Before merging a schema change to `main`, run 
 
 ## 👤 Author
 
-**Hernán Baravalle** — Design Engineer
-[GitHub](https://github.com/hbaravalle)
+**Hernán Baravalle** — Design Engineer · Buenos Aires, Argentina
+[Portfolio](https://hernanbaravalle.com) · [GitHub](https://github.com/hbaravalle)
