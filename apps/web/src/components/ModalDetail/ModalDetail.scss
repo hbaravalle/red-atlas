@@ -9,7 +9,6 @@
   top: 0;
   left: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  // Above the search bar (3000): the modal is the only thing to interact with
   z-index: 4000;
 
   .modal-wrapper {
@@ -64,9 +63,7 @@
     }
   }
 
-  // Scrolls inside the modal, so the top bar and its close button stay visible
   .content {
-    // Without min-height: 0 a flex child grows with its content and never scrolls
     min-height: 0;
     display: flex;
     flex-direction: column;
@@ -100,7 +97,6 @@
     }
   }
 
-  // Same look as the pills on the property cards
   .pills {
     display: flex;
     flex-wrap: wrap;
@@ -178,7 +174,6 @@
     background-color: #f2f2f2;
   }
 
-  // Value over label tiles, as many per row as fit
   .stats {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -251,7 +246,6 @@
     font-weight: bold;
   }
 
-  // Loading placeholder: grey bones in the place of each piece of content
   .skeleton {
     .bone {
       display: inline-block;
@@ -277,7 +271,6 @@
     }
 
     .stat {
-      // Two lines tall, like a value over its label
       flex-direction: column;
       gap: 8px;
 
@@ -294,7 +287,6 @@
   }
 }
 
-// Phones: the modal fills the screen and the photo stacks above the map
 @media (max-width: 640px) {
   .modal-detail {
     padding: 0;

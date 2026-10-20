@@ -10,7 +10,6 @@ body {
   font-family: 'Mulish';
 }
 
-// Shimmer shared by the loading skeletons
 @keyframes skeleton-shimmer {
   from {
     background-position: 100% 0;
@@ -20,7 +19,6 @@ body {
   }
 }
 
-// Read by screen readers, hidden from view
 .visually-hidden {
   position: absolute;
   width: 1px;

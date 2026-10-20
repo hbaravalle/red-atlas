@@ -22,7 +22,7 @@ app.use(function (req, res) {
   return res.status(404).json({ message: 'Not found' });
 });
 
-// Express 5 sends errors from async handlers here. Every error is { message }
+// Express 5 sends async errors here. Every error answers { message }
 app.use(function (error, req, res, next) {
   if (error instanceof ZodError) {
     const message = error.issues.map((issue) => issue.message).join('; ');
