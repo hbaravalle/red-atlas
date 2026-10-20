@@ -14,18 +14,17 @@ interface SearchFormValues {
 
 export default function Nav() {
   const { register, watch, setValue, setFocus } = useForm<SearchFormValues>();
-  // The results list hides when the user moves on, but the text stays, so
-  // focusing the field again brings the same results back
+  // Hiding the results keeps the text, so refocusing brings them back
   const [isOpen, setIsOpen] = useState(false);
   const navRef = useRef<HTMLElement | null>(null);
   const { pathname } = useLocation();
 
-  // Opening a modal (a result, or "Crear") closes the list
+  // Opening a modal closes the list
   useEffect(() => {
     setIsOpen(false);
   }, [pathname]);
 
-  // So does clicking anywhere outside the search bar
+  // So does clicking outside the nav
   useEffect(() => {
     const handlePointerDown = (event: PointerEvent) => {
       if (!navRef.current?.contains(event.target as Node)) setIsOpen(false);
@@ -36,15 +35,13 @@ export default function Nav() {
 
   const query = watch('query', '');
 
-  // Each query is cached, so deleting a letter shows the earlier results at
-  // once. While a new query loads, the previous results stay on screen, and a
-  // slow response for an older query never replaces those of the newer one.
+  // Each query is cached; while a new one loads, the previous results stay
   const { data } = useSearchPropertiesQuery(query, {
     skip: query.length < 3,
   });
   const results = query.length >= 3 ? (data?.properties ?? []) : [];
 
-  // Empty the field and keep the cursor in it, ready for a new search
+  // Keep the focus, ready for the next search
   const clearSearch = () => {
     setValue('query', '');
     setFocus('query');
@@ -54,16 +51,16 @@ export default function Nav() {
     <header>
       <nav ref={navRef}>
         <NavLink to='/' className='logo'>
-          {/* Absolute path: on /detail/:id a relative one would point to /detail/logo.svg */}
+          {/* Absolute path, so it also loads on /detail/:id */}
           <img src='/logo.svg' alt='Logo Red Atlas' />
         </NavLink>
         <div className='search'>
-          {/* Results update while typing, so Enter must not reload the page */}
+          {/* Results update while typing; Enter must not reload the page */}
           <form onSubmit={(event) => event.preventDefault()}>
             <Search aria-hidden='true' />
             <input
               type='text'
-              {...register('query')} // Se usa react-hook-form para registrar el campo
+              {...register('query')}
               id='search'
               autoComplete='off'
               placeholder='Buscar propiedades por título o dirección'

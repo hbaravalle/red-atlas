@@ -1,7 +1,6 @@
 import type { PropertyStatus, PropertyType } from '@red-atlas/shared';
 
-// Typed as Record over the shared unions: adding a value to the shared
-// package makes TypeScript require its label here.
+// Record over the shared unions, so a new value requires its label
 export const PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
   apartment: 'Apartamento',
   house: 'Casa',

@@ -55,7 +55,7 @@ export default function ModalCreate() {
   };
 
   const handleModalClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Detiene la propagación del clic al overlay
+    e.stopPropagation();
   };
 
   useEffect(() => {
@@ -68,13 +68,12 @@ export default function ModalCreate() {
 
   const onSubmit = async (data: FormValues) => {
     try {
-      // The mutation invalidates the cached lists, so the page and sort on
-      // screen reload on their own
+      // The mutation invalidates the cached lists, so the list reloads itself
       await createProperty(data).unwrap();
       toast.success('Propiedad creada exitosamente');
       handleClose();
     } catch (error) {
-      // A 400 carries the API's reason, e.g. a missing required field
+      // A 400 carries the API's reason
       const reason =
         isQueryError(error) && error.status === 400 ? `: ${error.message}` : '';
       toast.error(`Error al crear la propiedad${reason}`);
@@ -102,7 +101,7 @@ export default function ModalCreate() {
           </button>
         </header>
         <form onSubmit={handleSubmit(onSubmit)}>
-          {/* Only the fields scroll; the actions below stay in view */}
+          {/* Only the fields scroll */}
           <div className='fields'>
             <div className='form-group'>
               <label htmlFor='title'>Título</label>
@@ -158,7 +157,7 @@ export default function ModalCreate() {
                 <input
                   id='latitude'
                   type='number'
-                  step='any' // Permite números decimales
+                  step='any'
                   {...register('location.lat', {})}
                 />
               </div>
@@ -168,7 +167,7 @@ export default function ModalCreate() {
                 <input
                   id='longitude'
                   type='number'
-                  step='any' // Permite números decimales
+                  step='any'
                   {...register('location.lng', {})}
                 />
               </div>
@@ -180,7 +179,7 @@ export default function ModalCreate() {
                 id='image'
                 type='text'
                 {...register('images', {
-                  setValueAs: (value: string) => (value ? [value] : []), // Convierte el valor en un array si no está vacío
+                  setValueAs: (value: string) => (value ? [value] : []),
                 })}
               />
             </div>
@@ -190,11 +189,10 @@ export default function ModalCreate() {
               <input id='area' type='text' {...register('area')} />
             </div>
 
-            {/* Tipo de propiedad con Radio buttons */}
             <div className='form-group'>
               <label>Tipo de propiedad</label>
               <div className='radiobtn-group'>
-                {/* One option per shared type: a new type shows up here on its own */}
+                {/* One option per shared type */}
                 {PROPERTY_TYPES.map((type) => (
                   <label htmlFor={`type-${type}`} key={type}>
                     <input
@@ -214,7 +212,6 @@ export default function ModalCreate() {
               )}
             </div>
 
-            {/* Operación con Radio buttons: same labels as cards and detail */}
             <div className='form-group'>
               <label>Operación</label>
               <div className='radiobtn-group'>
@@ -243,7 +240,7 @@ export default function ModalCreate() {
             <button type='button' className='cancel' onClick={handleClose}>
               Cancelar
             </button>
-            {/* Disabled while saving, so a double click does not create two */}
+            {/* Disabled while saving, so a double click creates only one */}
             <button type='submit' disabled={isSaving}>
               {isSaving ? 'Creando...' : 'Crear propiedad'}
             </button>

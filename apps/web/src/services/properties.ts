@@ -8,8 +8,7 @@ import {
 } from '@red-atlas/shared';
 import { API_URL } from '../lib/api';
 
-// Every call to the properties API goes through this module, so URLs,
-// encoding, error handling and response types are defined once.
+// Every API call goes through here: URLs, errors and types live in one place
 
 export class ApiError extends Error {
   constructor(
@@ -25,7 +24,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, init);
 
   if (!response.ok) {
-    // The API sends { message } for 400 and 404; fall back to the status
+    // The API sends { message } on 400 and 404
     const body = await response.json().catch(() => null);
     throw new ApiError(
       response.status,
@@ -82,8 +81,7 @@ export async function getProperty(
   }
 }
 
-// What POST /properties accepts. Numbers may arrive as strings from form
-// inputs; the API converts them.
+// Numbers may be strings from form inputs; the API converts them
 export interface NewProperty {
   title: string;
   address?: string;

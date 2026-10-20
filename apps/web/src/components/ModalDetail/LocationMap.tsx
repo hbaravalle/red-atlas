@@ -23,7 +23,7 @@ export default function LocationMap({ lat, lng }: LocationMapProps) {
     });
     new maplibregl.Marker().setLngLat([lng, lat]).addTo(map);
 
-    // Each modal gets its own map, so free its WebGL context on close
+    // Free the WebGL context on close
     return () => map.remove();
   }, [lat, lng]);
 

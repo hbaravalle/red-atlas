@@ -1,6 +1,5 @@
-// Placeholder with the same structure as a property card, so the list keeps
-// its layout while a page loads. Each bone sits inside the same <p> the real
-// card uses, which makes the skeleton exactly as tall as the card.
+// Same structure as a property card, so the list keeps its layout while it
+// loads. Each bone sits in the same <p> as the card, to match its height
 export default function PropertyCardSkeleton() {
   return (
     <div className='card skeleton' aria-hidden='true'>

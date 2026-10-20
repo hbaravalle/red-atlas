@@ -2,8 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { SortOption } from '@red-atlas/shared';
 import type { ListParams } from './propertiesApi';
 
-// Client state: which page and sort the user picked. The list, the map and
-// the detail modal read it to ask RTK Query for the same, cached page.
+// Client state: the page and sort the list, map and detail all share
 
 const initialState: ListParams = {
   page: 1,
@@ -17,7 +16,7 @@ const propertiesSlice = createSlice({
     setPage: (state, action: PayloadAction<number>) => {
       state.page = action.payload;
     },
-    // A new order starts again from the first page
+    // A new sort starts from page 1
     setSort: (state, action: PayloadAction<SortOption>) => {
       state.sort = action.payload;
       state.page = 1;

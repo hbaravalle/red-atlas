@@ -3,13 +3,12 @@ import 'dotenv/config';
 import Property from '../models/Property.js';
 import list from './properties.json' with { type: 'json' };
 
-// One multi-row INSERT per batch instead of one request per property.
-// 500 rows x 15 columns stays well under Postgres' 65,535 bind parameters.
+// 500 rows x 15 columns stays under Postgres' 65,535 bind parameters
 const BATCH_SIZE = 500;
 
 async function propertySeeder() {
   try {
-    // Start from an empty table so the seeder can run more than once
+    // Empty the table so the seeder can run again
     await Property.destroyAll();
 
     for (let start = 0; start < list.length; start += BATCH_SIZE) {

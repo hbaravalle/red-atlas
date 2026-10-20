@@ -13,9 +13,7 @@ import {
   type NewProperty,
 } from '../services/properties';
 
-// Server state: RTK Query caches each response by its arguments, shares one
-// request between every component that asks for the same data, and refetches
-// what a mutation invalidates. The requests themselves stay in the service.
+// Server state: caching and refetching. The requests live in services/
 
 export interface QueryError {
   status: number | 'NETWORK_ERROR';
@@ -37,8 +35,7 @@ export interface ListParams {
 export const propertiesApi = createApi({
   reducerPath: 'propertiesApi',
   baseQuery: fakeBaseQuery<QueryError>(),
-  // "List" covers every page and search result, so a new property refreshes
-  // whatever list is on screen
+  // "List" tags every page and search, so a new property refreshes them
   tagTypes: ['List', 'Property'],
   endpoints: (build) => ({
     getProperties: build.query<PaginatedProperties, ListParams>({

@@ -13,8 +13,7 @@ import {
 import { PROPERTY_STATUSES, PROPERTY_TYPES } from '@red-atlas/shared';
 import db from '../config/db.js';
 
-// DDL can't take bind parameters, so the allowed values are inlined as SQL
-// literals. Safe here: they come from our own constants, never from user input.
+// DDL can't take bind parameters. Safe to inline: the values are our constants
 const oneOf = (column, values) =>
   sql`${column} IN (${sql.raw(values.map((value) => `'${value}'`).join(', '))})`;
 
@@ -54,31 +53,29 @@ export const properties = snakeCase.table(
   ],
 );
 
-// Sort options map to column objects, so user input never reaches the SQL.
-// The id tiebreaker keeps pages stable when several rows share a price.
+// Sort keys map to columns, so user input never reaches the SQL. id breaks ties
 const ORDER_BY = {
   price_asc: [asc(properties.price), asc(properties.id)],
   price_desc: [desc(properties.price), desc(properties.id)],
 };
 const DEFAULT_ORDER = [desc(properties.createdAt), desc(properties.id)];
 
-// Any UUID version: ids are v7, but a v4-only pattern would reject them.
+// Any UUID version: ids are v7
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-// null for missing or non-numeric input, so NOT NULL rejects it instead of
-// Postgres silently storing NaN in a double precision column.
+// null instead of NaN, so NOT NULL rejects bad input
 function toNumber(value) {
   const number = Number(value);
   return value == null || value === '' || Number.isNaN(number) ? null : number;
 }
 
-// Treat %, _ and \ in the search text as literal characters, not wildcards.
+// Match %, _ and \ literally, not as wildcards
 function escapeLike(text) {
   return text.replace(/[\\%_]/g, '\\$&');
 }
 
-// Row from the database → the JSON shape the web app consumes.
+// Table row → API JSON
 function toProperty(row) {
   const { id, lat, lng, price, area, ownerName, ownerContact, ...rest } = row;
 
@@ -92,8 +89,7 @@ function toProperty(row) {
   };
 }
 
-// API shape (nested location and owner) → table columns. Undefined values
-// are left out of the INSERT, so the column defaults apply.
+// API JSON → table row. Undefined values fall back to the column defaults
 function toRow(property) {
   const { location, owner, createdAt, updatedAt } = property;
 

@@ -54,7 +54,7 @@ async function getById(req, res) {
 async function search(req, res) {
   const { query } = req.query;
 
-  // ?query=a&query=b arrives as an array, so check the type too
+  // ?query=a&query=b arrives as an array
   if (typeof query !== 'string' || query.trim().length === 0) {
     return res.status(400).json({ message: 'Query string is required' });
   }

@@ -1,4 +1,4 @@
-// Base URL of the Red Atlas API. Point VITE_API_URL at http://localhost:3000/api
-// to develop against the local API in apps/api; defaults to production.
+// Defaults to production. For the local API, set
+// VITE_API_URL=http://localhost:3000/api
 export const API_URL: string =
   import.meta.env.VITE_API_URL ?? 'https://red-atlas-api.vercel.app/api';

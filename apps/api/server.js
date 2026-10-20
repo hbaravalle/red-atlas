@@ -12,8 +12,7 @@ app.use(
   })
 );
 app.use(express.json());
-// Files in public/ (the favicon). On Vercel the CDN serves them before the
-// request reaches the app; locally express.static does it
+// Serves the favicon locally; on Vercel the CDN does it
 app.use(express.static('public'));
 
 app.use('/api/properties', propertiesRoutes);
@@ -40,8 +39,7 @@ app.use(function (error, req, res, next) {
   return res.status(500).json('Server error');
 });
 
-// On Vercel the exported app runs as a function and Vercel handles the port;
-// listen only when running the server ourselves
+// On Vercel the app runs as a function; listen only when run directly
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`[Server] Listening on http://localhost:${PORT}`);

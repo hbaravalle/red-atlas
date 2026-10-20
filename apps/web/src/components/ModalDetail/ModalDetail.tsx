@@ -33,8 +33,7 @@ export default function ModalDetail() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
 
-  // Properties from the current page are already cached: show them on the
-  // first render instead of flashing a loading state
+  // Properties on the current page are cached, so they show without loading
   const listParams = useAppSelector((state) => state.properties);
   const { listed } = useGetPropertiesQuery(listParams, {
     selectFromResult: ({ data }) => ({
@@ -42,14 +41,12 @@ export default function ModalDetail() {
     }),
   });
 
-  // Anything else (a search result, a reload on /detail/:id) is fetched once
-  // and cached by id, so opening it again is instant
+  // Others (a search result, a reload) are fetched and cached by id
   const { currentData, isError } = useGetPropertyQuery(id, {
     skip: Boolean(listed) || !id,
   });
 
-  // currentData is undefined while the current id loads, so the previous
-  // property never shows for a new one
+  // currentData, unlike data, never shows the previous property
   const state: LoadState = listed
     ? { status: 'ready', property: listed }
     : isError
@@ -99,7 +96,7 @@ export default function ModalDetail() {
           <Feedback message='No pudimos cargar la propiedad. Probá de nuevo en unos segundos.' />
         )}
         {state.status === 'ready' && (
-          // The key resets the gallery and "Leer más" when the property changes
+          // The key resets the gallery and "Leer más"
           <PropertyDetail key={state.property._id} property={state.property} />
         )}
       </article>
@@ -107,8 +104,7 @@ export default function ModalDetail() {
   );
 }
 
-// Same blocks and heights as PropertyDetail, so the modal does not resize
-// when the property arrives
+// Same layout as PropertyDetail, so the modal doesn't resize when it loads
 function DetailSkeleton() {
   return (
     <>

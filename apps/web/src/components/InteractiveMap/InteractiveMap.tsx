@@ -4,22 +4,20 @@ import { MAP_STYLE, maplibregl } from '../../lib/maplibre';
 import { useGetPropertiesQuery } from '../../redux/propertiesApi';
 import { useAppSelector } from '../../redux/store';
 
-// Stable empty list, so the markers effect does not rerun on every render
-// while the first page loads
+// Stable reference, so the markers effect doesn't rerun while loading
 const NO_PROPERTIES: Property[] = [];
 
-// Puerto Rico with Vieques and Culebra; every property in the dataset is inside
+// Puerto Rico, Vieques and Culebra: every property is inside
 const PUERTO_RICO_BOUNDS: maplibregl.LngLatBoundsLike = [
   [-67.3, 17.8],
   [-65.2, 18.5],
 ];
 const GAP = 20;
-// Below this, the free area is too small to frame the island in
+// Below this, ignore the panels and use the whole map
 const MIN_VISIBLE_SIZE = 150;
 
-// The search bar and the property list float over the map. Measure them so
-// Puerto Rico is framed in the area they leave uncovered: the list is a column
-// on the right on desktop and a sheet at the bottom on smaller screens.
+// Frame the island in the area the nav and the list leave uncovered.
+// The list is a right column on desktop and a bottom sheet on mobile
 function getUncoveredPadding(): maplibregl.PaddingOptions {
   const padding = { top: GAP, right: GAP, bottom: GAP, left: GAP };
   const nav = document.querySelector('header nav');
@@ -63,7 +61,7 @@ const InteractiveMap = () => {
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markersRef = useRef<maplibregl.Marker[]>([]);
 
-  // Same arguments as PropertyList, so RTK Query serves both from one request
+  // Same arguments as PropertyList, so both share one request
   const listParams = useAppSelector((state) => state.properties);
   const { data } = useGetPropertiesQuery(listParams);
   const properties = data?.properties ?? NO_PROPERTIES;
@@ -79,16 +77,14 @@ const InteractiveMap = () => {
         fitBoundsOptions: { padding: getUncoveredPadding() },
       });
 
-      // The panels change size with the window, so frame the island again
+      // The panels resize with the window, so reframe the island
       map.on('resize', () => framePuertoRico(map));
       mapRef.current = map;
     }
 
-    // Limpiar los marcadores previos
     markersRef.current.forEach((marker) => marker.remove());
-    markersRef.current = []; // Resetear lista de marcadores
+    markersRef.current = [];
 
-    // Crear nuevos marcadores
     for (const property of properties) {
       if (property.location?.lng && property.location?.lat) {
         const marker = new maplibregl.Marker()
@@ -102,10 +98,9 @@ const InteractiveMap = () => {
       }
     }
 
-    // No es necesario eliminar el mapa, solo los marcadores
     return () => {
       markersRef.current.forEach((marker) => marker.remove());
-      markersRef.current = []; // Limpiar los marcadores cuando se desmonte el componente
+      markersRef.current = [];
     };
   }, [properties]);
 

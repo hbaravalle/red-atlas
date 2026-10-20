@@ -19,19 +19,16 @@ export default function PropertyList() {
   const dispatch = useAppDispatch();
   const listParams = useAppSelector((state) => state.properties);
   const { page, sort } = listParams;
-  // isFetching is also true while a cached page refreshes, e.g. after a
-  // property is created, so the skeleton shows whenever the list may change
+  // isFetching is also true when a cached page refreshes after a create
   const { data, isFetching, isError, refetch } =
     useGetPropertiesQuery(listParams);
   const properties = data?.properties ?? NO_PROPERTIES;
   const totalPages = data?.totalPages ?? 1;
 
-  // Cambiar el filtro
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     dispatch(setSort(event.target.value as SortOption));
   };
 
-  // Cambiar la página
   const handlePageChange = (newPage: number) => {
     dispatch(setPage(newPage));
   };

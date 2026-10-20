@@ -24,7 +24,6 @@ export const formatArea = (area: number) => `${areaFormat.format(area)} pie²`;
 export const formatPricePerArea = (price: number, area: number) =>
   `${pricePerAreaFormat.format(price / area)}/pie²`;
 
-// "hace 2 años" instead of "hace casi 2 años": the strict variant rounds and
-// drops the approximation words, which keeps cards and stat tiles short
+// Strict: "hace 2 años", not "hace casi 2 años"
 export const formatTimeAgo = (date: string) =>
   formatDistanceToNowStrict(new Date(date), { addSuffix: true, locale: es });
