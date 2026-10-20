@@ -196,12 +196,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  #propertyList .card.skeleton .bone {
-    animation: none;
-  }
-}
-
 @media (max-width: 1200px) {
   #propertyList {
     .container {

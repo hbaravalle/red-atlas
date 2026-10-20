@@ -278,12 +278,6 @@
         height: 1.1em;
       }
     }
-
-    @media (prefers-reduced-motion: reduce) {
-      .bone {
-        animation: none;
-      }
-    }
   }
 }
 
