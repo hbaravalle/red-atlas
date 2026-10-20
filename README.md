@@ -9,7 +9,8 @@ A responsive real estate app to browse, search and publish property listings on 
 ![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-764ABC?style=flat-square&logo=redux&logoColor=white)
 ![MapLibre](https://img.shields.io/badge/MapLibre_GL-396CB2?style=flat-square&logo=maplibre&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white)
-![Express](https://img.shields.io/badge/Express-000000?style=flat-square&logo=express&logoColor=white)
+![Express](https://img.shields.io/badge/Express_5-000000?style=flat-square&logo=express&logoColor=white)
+![Zod](https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)
 ![Neon](https://img.shields.io/badge/Neon-00E599?style=flat-square&logo=neon&logoColor=black)
 ![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-C5F74F?style=flat-square&logo=drizzle&logoColor=black)
@@ -77,7 +78,7 @@ The API first ran on MongoDB Atlas with Mongoose. I later moved it to **Postgres
 - Paginated listing with navigation metadata, with page size capped at 100
 - Sorting by newest, price ascending or price descending, with a tiebreaker so pages stay stable
 - Case-insensitive search across title and address, with `%` and `_` matched literally
-- Create and delete endpoints that answer `400` for invalid data and `404` for unknown ids
+- Requests validated with Zod: invalid data gets a `400` that names each problem, unknown ids a `404`, and every error has the same `{ message }` shape
 - Batched seeder that loads the 10,000-property dataset
 - Serverless deployment on Vercel, database on Neon
 
@@ -100,7 +101,7 @@ red-atlas/
 
 The package is plain JavaScript with hand-written type declarations, so the API runs on Node without a build step and the web app still gets full types.
 
-**Layers in the API.** Routes map URLs to the controller, which only deals with HTTP: reading the request, validating it and choosing the status code. Every query lives in the model (`models/Property.js`), next to the Drizzle table definition and the mapping between table rows and the JSON the web app expects.
+**Layers in the API.** Routes map URLs to the controller, which only deals with HTTP: reading the request and choosing the status code. Zod schemas (`schemas/propertySchema.js`) validate the body and the query params, and when one fails, a single error handler answers `400`, so no handler needs its own checks or `try/catch`. Every query lives in the model (`models/Property.js`), next to the Drizzle table definition and the mapping between table rows and the JSON the web app expects.
 
 **State and routing.** The web app keeps server state and client state apart. **RTK Query** caches every API response by its arguments: the list, the map and the detail modal ask for the same page and share one request, and creating a property invalidates the cached lists so the page on screen reloads by itself. A small Redux slice holds the only client state the components share: the page and sort the user picked. All requests go through one service module (`src/services/properties.ts`) that builds the URLs and types the responses with the shared contract. Routes drive the modals, so the browser's back button works as users expect.
 
@@ -126,7 +127,10 @@ Query parameters for listing and search:
 | `sort` | newest first | `price_asc` or `price_desc` |
 | `query` | — | **Required for `/search`**: text to match in title or address |
 
-Invalid `page` or `limit` values fall back to the defaults. `POST /properties` answers `400` with a message when the data breaks a rule (a missing required field, an unknown `type` or `status`), and `GET` and `DELETE /properties/:id` answer `404` when no property has that id.
+Invalid `page`, `limit` or `sort` values fall back to the defaults. Every error answers `{ "message": "..." }`:
+
+- `400` when the body of `POST /properties` breaks a rule, listing every problem: `"title is required; price must be a number"`. Numbers can be sent as strings, as form inputs do. `/search` without `query` also answers `400`.
+- `404` when no property has the id in `GET` or `DELETE /properties/:id`, or the route doesn't exist.
 
 ```bash
 curl "https://red-atlas-api.vercel.app/api/properties/search?query=suite&sort=price_asc&limit=5"

@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import cors from 'cors';
 import express from 'express';
+import { ZodError } from 'zod';
 import propertiesRoutes from './routes/propertyRoutes.js';
 
 const PORT = process.env.APP_PORT || process.env.PORT || 3000;
@@ -18,16 +19,14 @@ app.use(express.static('public'));
 app.use('/api/properties', propertiesRoutes);
 
 app.use(function (req, res) {
-  return res.status(404).json('Not found');
+  return res.status(404).json({ message: 'Not found' });
 });
 
-// Postgres errors caused by bad input (not null, check, bad text, out of range)
-const INVALID_DATA_CODES = ['23502', '23514', '22P02', '22003'];
-
-// Express 5 sends errors from async handlers here
+// Express 5 sends errors from async handlers here. Every error is { message }
 app.use(function (error, req, res, next) {
-  if (INVALID_DATA_CODES.includes(error.cause?.code)) {
-    return res.status(400).json({ message: error.cause.message });
+  if (error instanceof ZodError) {
+    const message = error.issues.map((issue) => issue.message).join('; ');
+    return res.status(400).json({ message });
   }
 
   // Malformed JSON, rejected by express.json()
@@ -36,7 +35,7 @@ app.use(function (error, req, res, next) {
   }
 
   console.error(error);
-  return res.status(500).json('Server error');
+  return res.status(500).json({ message: 'Server error' });
 });
 
 // On Vercel the app runs as a function; listen only when run directly

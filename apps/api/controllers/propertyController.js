@@ -1,30 +1,15 @@
-import {
-  DEFAULT_PAGE_SIZE,
-  PROPERTY_STATUSES,
-  PROPERTY_TYPES,
-} from '@red-atlas/shared';
 import Property from '../models/Property.js';
+import {
+  newProperty,
+  pageQuery,
+  searchQuery,
+} from '../schemas/propertySchema.js';
 
-const MAX_PAGE_SIZE = 100;
+// A failed parse throws a ZodError, which the error handler answers with a 400
 
-function toPositiveInt(value, fallback) {
-  const number = parseInt(value, 10);
-  return Number.isNaN(number) || number < 1 ? fallback : number;
-}
-
-async function paginate(req, res, query) {
-  const page = toPositiveInt(req.query.page, 1);
-  const limit = Math.min(
-    toPositiveInt(req.query.limit, DEFAULT_PAGE_SIZE),
-    MAX_PAGE_SIZE
-  );
-
-  const { properties, total } = await Property.findPage({
-    query,
-    sort: req.query.sort,
-    page,
-    limit,
-  });
+async function paginate(res, params) {
+  const { page, limit } = params;
+  const { properties, total } = await Property.findPage(params);
   const totalPages = Math.ceil(total / limit);
 
   return res.status(200).json({
@@ -38,7 +23,7 @@ async function paginate(req, res, query) {
 }
 
 async function getAll(req, res) {
-  return paginate(req, res);
+  return paginate(res, pageQuery.parse(req.query));
 }
 
 async function getById(req, res) {
@@ -52,14 +37,7 @@ async function getById(req, res) {
 }
 
 async function search(req, res) {
-  const { query } = req.query;
-
-  // ?query=a&query=b arrives as an array
-  if (typeof query !== 'string' || query.trim().length === 0) {
-    return res.status(400).json({ message: 'Query string is required' });
-  }
-
-  return paginate(req, res, query.trim());
+  return paginate(res, searchQuery.parse(req.query));
 }
 
 async function count(req, res) {
@@ -68,47 +46,8 @@ async function count(req, res) {
 }
 
 async function create(req, res) {
-  // req.body is undefined when the request has no JSON body
-  const {
-    address,
-    title,
-    description,
-    location,
-    images,
-    type,
-    status,
-    isActive,
-    price,
-    area,
-    owner,
-  } = req.body ?? {};
-
-  if (!PROPERTY_TYPES.includes(type)) {
-    return res
-      .status(400)
-      .json({ message: `type must be one of: ${PROPERTY_TYPES.join(', ')}` });
-  }
-
-  if (!PROPERTY_STATUSES.includes(status)) {
-    return res.status(400).json({
-      message: `status must be one of: ${PROPERTY_STATUSES.join(', ')}`,
-    });
-  }
-
-  const newProperty = await Property.create({
-    address,
-    title,
-    description,
-    location,
-    images,
-    type,
-    status,
-    isActive,
-    price,
-    area,
-    owner,
-  });
-  return res.status(201).json(newProperty);
+  const property = await Property.create(newProperty.parse(req.body));
+  return res.status(201).json(property);
 }
 
 async function destroy(req, res) {
