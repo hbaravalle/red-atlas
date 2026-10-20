@@ -1,38 +1,22 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { X } from 'react-feather';
 import toast from 'react-hot-toast';
+import type { z } from 'zod';
 import {
   useCreatePropertyMutation,
   type QueryError,
 } from '../../redux/propertiesApi';
 import './ModalCreate.scss';
-import {
-  PROPERTY_STATUSES,
-  PROPERTY_TYPES,
-  type PropertyStatus,
-  type PropertyType,
-} from '@red-atlas/shared';
+import { PROPERTY_STATUSES, PROPERTY_TYPES } from '@red-atlas/shared';
+import { newProperty } from '@red-atlas/shared/schemas';
 import { PROPERTY_STATUS_LABELS, PROPERTY_TYPE_LABELS } from '../../lib/labels';
 
-interface FormValues {
-  title: string;
-  address: string;
-  price: number;
-  description: string;
-  images: string[];
-  type: PropertyType;
-  status: PropertyStatus;
-  area: string;
-  ownerName: string;
-  contact: string;
-  isActive: boolean;
-  location: {
-    lat: string;
-    lng: string;
-  };
-}
+// Same schema as the API
+type FormInput = z.input<typeof newProperty>;
+type FormOutput = z.output<typeof newProperty>;
 
 const isQueryError = (error: unknown): error is QueryError =>
   typeof error === 'object' &&
@@ -47,7 +31,9 @@ export default function ModalCreate() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormValues>();
+  } = useForm<FormInput, unknown, FormOutput>({
+    resolver: zodResolver(newProperty),
+  });
   const navigate = useNavigate();
 
   const handleClose = () => {
@@ -66,7 +52,7 @@ export default function ModalCreate() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [navigate]);
 
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async (data: FormOutput) => {
     try {
       // The mutation invalidates the cached lists, so the list reloads itself
       await createProperty(data).unwrap();
@@ -108,7 +94,7 @@ export default function ModalCreate() {
               <input
                 id='title'
                 type='text'
-                {...register('title', { required: 'Title is required' })}
+                {...register('title')}
               />
               {errors.title && (
                 <span className='error'>{errors.title.message}</span>
@@ -120,9 +106,7 @@ export default function ModalCreate() {
               <input
                 id='address'
                 type='text'
-                {...register('address', {
-                  required: 'Address is required',
-                })}
+                {...register('address')}
               />
               {errors.address && (
                 <span className='error'>{errors.address.message}</span>
@@ -134,9 +118,8 @@ export default function ModalCreate() {
               <input
                 id='price'
                 type='number'
-                {...register('price', {
-                  required: 'Price is required',
-                })}
+                step='any'
+                {...register('price')}
               />
               {errors.price && (
                 <span className='error'>{errors.price.message}</span>
@@ -158,9 +141,7 @@ export default function ModalCreate() {
                   id='latitude'
                   type='number'
                   step='any'
-                  {...register('location.lat', {
-                    required: 'Latitude is required',
-                  })}
+                  {...register('location.lat')}
                 />
                 {errors.location?.lat && (
                   <span className='error'>{errors.location.lat.message}</span>
@@ -173,9 +154,7 @@ export default function ModalCreate() {
                   id='longitude'
                   type='number'
                   step='any'
-                  {...register('location.lng', {
-                    required: 'Longitude is required',
-                  })}
+                  {...register('location.lng')}
                 />
                 {errors.location?.lng && (
                   <span className='error'>{errors.location.lng.message}</span>
@@ -192,11 +171,19 @@ export default function ModalCreate() {
                   setValueAs: (value: string) => (value ? [value] : []),
                 })}
               />
+              {errors.images && (
+                <span className='error'>
+                  {errors.images[0]?.message ?? errors.images.message}
+                </span>
+              )}
             </div>
 
             <div className='form-group'>
               <label htmlFor='area'>Area (sq ft)</label>
-              <input id='area' type='text' {...register('area')} />
+              <input id='area' type='number' step='any' {...register('area')} />
+              {errors.area && (
+                <span className='error'>{errors.area.message}</span>
+              )}
             </div>
 
             <div className='form-group'>
@@ -209,9 +196,7 @@ export default function ModalCreate() {
                       id={`type-${type}`}
                       type='radio'
                       value={type}
-                      {...register('type', {
-                        required: 'Property type is required',
-                      })}
+                      {...register('type')}
                     />
                     {PROPERTY_TYPE_LABELS[type]}
                   </label>
@@ -231,9 +216,7 @@ export default function ModalCreate() {
                       id={`status-${status}`}
                       type='radio'
                       value={status}
-                      {...register('status', {
-                        required: 'Listing is required',
-                      })}
+                      {...register('status')}
                     />
                     {PROPERTY_STATUS_LABELS[status]}
                   </label>

@@ -1,11 +1,8 @@
+import { newProperty } from '@red-atlas/shared/schemas';
 import Property from '../models/Property.js';
-import {
-  newProperty,
-  pageQuery,
-  searchQuery,
-} from '../schemas/propertySchema.js';
+import { pageQuery, searchQuery } from '../schemas/propertySchema.js';
 
-// A failed parse throws a ZodError, which the error handler answers with a 400
+// A failed parse throws, and the error handler answers 400
 
 async function paginate(res, params) {
   const { page, limit } = params;

@@ -1,11 +1,11 @@
+import type { z } from 'zod';
 import {
   DEFAULT_PAGE_SIZE,
   type PaginatedProperties,
   type Property,
-  type PropertyStatus,
-  type PropertyType,
   type SortOption,
 } from '@red-atlas/shared';
+import type { newProperty } from '@red-atlas/shared/schemas';
 import { API_URL } from '../lib/api';
 
 // Every API call goes through here: URLs, errors and types live in one place
@@ -81,20 +81,8 @@ export async function getProperty(
   }
 }
 
-// Numbers may be strings from form inputs; the API converts them
-export interface NewProperty {
-  title: string;
-  address?: string;
-  description?: string;
-  location: { lat: number | string; lng: number | string };
-  images?: string[];
-  type: PropertyType;
-  status: PropertyStatus;
-  isActive?: boolean;
-  price: number | string;
-  area?: number | string;
-  owner?: { name?: string; contact?: string };
-}
+// A property that already passed the shared schema
+export type NewProperty = z.output<typeof newProperty>;
 
 export function createProperty(property: NewProperty) {
   return request<Property>('/properties', {

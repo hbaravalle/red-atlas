@@ -71,7 +71,7 @@ The API first ran on MongoDB Atlas with Mongoose. I later moved it to **Postgres
 - Interactive map (MapLibre GL + free OpenStreetMap tiles from OpenFreeMap, no API key) with a marker for every listed property, framed on Puerto Rico in the area the panels leave visible
 - Search by title or address, resolved by the API, with a clear button and keyboard support
 - Property detail as a routed modal (`/detail/:id`), so every property has a shareable URL: photo, location map, key facts including price per square foot, description and owner contact
-- Create a property (`/create`) with a form validated by React Hook Form
+- Create a property (`/create`) with a form validated by the same Zod schema as the API, loaded only when the form opens
 - Toast feedback and a fully responsive layout
 
 **API** (`apps/api`)
@@ -94,14 +94,15 @@ red-atlas/
 └── pnpm-workspace.yaml
 ```
 
-**One source of truth for the domain.** `@red-atlas/shared` defines the property types (`apartment`, `house`, `office`, `land`), statuses (`sale`, `rent`), sort options and page size, plus the TypeScript types for a `Property` and the paginated response.
+**One source of truth for the domain.** `@red-atlas/shared` defines the property types (`apartment`, `house`, `office`, `land`), statuses (`sale`, `rent`), sort options and page size, plus the TypeScript types for a `Property` and the paginated response. Its `schemas` entry point holds the Zod schema for a new property.
 
 - The **API** validates requests against those values and turns them into `CHECK` constraints in the database, so nothing outside them can be stored.
 - The **web app** uses the same values for its types and UI labels. The label maps are typed as `Record<PropertyType, string>`, so adding a new property type to the shared package makes TypeScript flag every place in the UI that needs a label.
+- The **create form and `POST /properties`** validate with the same schema, so the form shows the errors the API would answer, with the same messages, before anything is sent.
 
-The package is plain JavaScript with hand-written type declarations, so the API runs on Node without a build step and the web app still gets full types.
+The package is plain JavaScript, so the API runs on Node without a build step. The web app gets full types anyway: hand-written declarations for the values, and for the schema TypeScript infers them from the JavaScript itself (`allowJs`, with JSDoc on the schema's helpers). Zod sits behind its own entry point, so it reaches the web bundle only with the create form.
 
-**Layers in the API.** Routes map URLs to the controller, which only deals with HTTP: reading the request and choosing the status code. Zod schemas (`schemas/propertySchema.js`) validate the body and the query params, and when one fails, a single error handler answers `400`, so no handler needs its own checks or `try/catch`. Every query lives in the model (`models/Property.js`), next to the Drizzle table definition and the mapping between table rows and the JSON the web app expects.
+**Layers in the API.** Routes map URLs to the controller, which only deals with HTTP: reading the request and choosing the status code. Zod schemas validate the body (`@red-atlas/shared/schemas`) and the query params (`schemas/propertySchema.js`), and when one fails, a single error handler answers `400`, so no handler needs its own checks or `try/catch`. Every query lives in the model (`models/Property.js`), next to the Drizzle table definition and the mapping between table rows and the JSON the web app expects.
 
 **State and routing.** The web app keeps server state and client state apart. **RTK Query** caches every API response by its arguments: the list, the map and the detail modal ask for the same page and share one request, and creating a property invalidates the cached lists so the page on screen reloads by itself. A small Redux slice holds the only client state the components share: the page and sort the user picked. All requests go through one service module (`src/services/properties.ts`) that builds the URLs and types the responses with the shared contract. Routes drive the modals, so the browser's back button works as users expect.
 
@@ -129,7 +130,7 @@ Query parameters for listing and search:
 
 Invalid `page`, `limit` or `sort` values fall back to the defaults. Every error answers `{ "message": "..." }`:
 
-- `400` when the body of `POST /properties` breaks a rule, listing every problem: `"title is required; price must be a number"`. Numbers can be sent as strings, as form inputs do. `/search` without `query` also answers `400`.
+- `400` when the body of `POST /properties` breaks a rule, listing every problem: `"Title is required; Price must be a number"`. Numbers can be sent as strings, as form inputs do. `/search` without `query` also answers `400`.
 - `404` when no property has the id in `GET` or `DELETE /properties/:id`, or the route doesn't exist.
 
 ```bash

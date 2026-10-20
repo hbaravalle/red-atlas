@@ -2,7 +2,7 @@
   "name": "@red-atlas/shared",
   "version": "1.0.0",
   "private": true,
-  "description": "Property domain values and types shared by the Red Atlas web app and API.",
+  "description": "Property domain values, types and the new-property schema shared by the Red Atlas web app and API.",
   "type": "module",
   "main": "./index.js",
   "types": "./index.d.ts",
@@ -10,6 +10,10 @@
     ".": {
       "types": "./index.d.ts",
       "default": "./index.js"
-    }
+    },
+    "./schemas": "./schemas.js"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
   }
 }
