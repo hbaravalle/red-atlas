@@ -1,10 +1,9 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { X } from 'react-feather';
 import toast from 'react-hot-toast';
 import type { z } from 'zod';
+import { useAnimatedClose } from '../../hooks/useAnimatedClose';
 import {
   useCreatePropertyMutation,
   type QueryError,
@@ -34,23 +33,11 @@ export default function ModalCreate() {
   } = useForm<FormInput, unknown, FormOutput>({
     resolver: zodResolver(newProperty),
   });
-  const navigate = useNavigate();
-
-  const handleClose = () => {
-    navigate('/');
-  };
+  const { isClosing, close: handleClose, onAnimationEnd } = useAnimatedClose();
 
   const handleModalClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') navigate('/');
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [navigate]);
 
   const onSubmit = async (data: FormOutput) => {
     try {
@@ -67,7 +54,11 @@ export default function ModalCreate() {
   };
 
   return (
-    <div className='modal-create' onClick={handleClose}>
+    <div
+      className={isClosing ? 'modal-create closing' : 'modal-create'}
+      onClick={handleClose}
+      onAnimationEnd={onAnimationEnd}
+    >
       <div
         className='modal-wrapper'
         role='dialog'

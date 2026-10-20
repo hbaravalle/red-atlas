@@ -1,5 +1,5 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
-import { NavLink, useNavigate, useParams } from 'react-router';
+import { lazy, Suspense, useState } from 'react';
+import { NavLink, useParams } from 'react-router';
 import { format } from 'date-fns';
 import { ChevronLeft, ChevronRight, MapPin, X } from 'react-feather';
 import type { Property } from '@red-atlas/shared';
@@ -9,6 +9,7 @@ import {
   formatPricePerArea,
   formatTimeAgo,
 } from '../../lib/format';
+import { useAnimatedClose } from '../../hooks/useAnimatedClose';
 import { PROPERTY_STATUS_LABELS, PROPERTY_TYPE_LABELS } from '../../lib/labels';
 import {
   useGetPropertiesQuery,
@@ -32,7 +33,6 @@ const DESCRIPTION_PREVIEW_LENGTH = 280;
 
 export default function ModalDetail() {
   const { id = '' } = useParams();
-  const navigate = useNavigate();
 
   // Properties on the current page are cached, so they show without loading
   const listParams = useAppSelector((state) => state.properties);
@@ -58,18 +58,14 @@ export default function ModalDetail() {
           ? { status: 'not-found' }
           : { status: 'ready', property: currentData };
 
-  const handleClose = () => navigate('/');
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') navigate('/');
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [navigate]);
+  const { isClosing, close: handleClose, onAnimationEnd } = useAnimatedClose();
 
   return (
-    <div className='modal-detail' onClick={handleClose}>
+    <div
+      className={isClosing ? 'modal-detail closing' : 'modal-detail'}
+      onClick={handleClose}
+      onAnimationEnd={onAnimationEnd}
+    >
       <article
         className='modal-wrapper'
         role='dialog'
@@ -91,10 +87,16 @@ export default function ModalDetail() {
 
         {state.status === 'loading' && <DetailSkeleton />}
         {state.status === 'not-found' && (
-          <Feedback message="This property doesn't exist or was deleted." />
+          <Feedback
+            message="This property doesn't exist or was deleted."
+            onBack={handleClose}
+          />
         )}
         {state.status === 'error' && (
-          <Feedback message="We couldn't load the property. Try again in a few seconds." />
+          <Feedback
+            message="We couldn't load the property. Try again in a few seconds."
+            onBack={handleClose}
+          />
         )}
         {state.status === 'ready' && (
           // The key resets the gallery and "Read more"
@@ -143,11 +145,25 @@ function DetailSkeleton() {
   );
 }
 
-function Feedback({ message }: { message: string }) {
+interface FeedbackProps {
+  message: string;
+  onBack: () => void;
+}
+
+function Feedback({ message, onBack }: FeedbackProps) {
   return (
     <div className='feedback'>
       <p>{message}</p>
-      <NavLink to='/'>Back to the list</NavLink>
+      {/* Still a link to /, but it closes with the same animation */}
+      <NavLink
+        to='/'
+        onClick={(event) => {
+          event.preventDefault();
+          onBack();
+        }}
+      >
+        Back to the list
+      </NavLink>
     </div>
   );
 }
