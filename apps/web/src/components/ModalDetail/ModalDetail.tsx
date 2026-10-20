@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { NavLink, useNavigate, useParams } from 'react-router';
 import { format } from 'date-fns';
 import { ChevronLeft, ChevronRight, MapPin, X } from 'react-feather';
@@ -16,8 +16,10 @@ import {
 } from '../../redux/propertiesApi';
 import { useAppSelector } from '../../redux/store';
 import defaultImage from '../../assets/property-default.jpg';
-import LocationMap from './LocationMap';
 import './ModalDetail.scss';
+
+// Shares the MapLibre chunk with the main map
+const LocationMap = lazy(() => import('./LocationMap'));
 
 type LoadState =
   | { status: 'loading' }
@@ -189,7 +191,9 @@ function PropertyDetail({ property }: { property: Property }) {
 
       <div className='media'>
         <Gallery images={property.images} title={title} />
-        <LocationMap lat={location.lat} lng={location.lng} />
+        <Suspense fallback={<div className='location-map' />}>
+          <LocationMap lat={location.lat} lng={location.lng} />
+        </Suspense>
       </div>
 
       <dl className='stats'>

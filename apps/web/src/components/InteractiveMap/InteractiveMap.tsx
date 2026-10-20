@@ -104,13 +104,7 @@ const InteractiveMap = () => {
     };
   }, [properties]);
 
-  return (
-    <div
-      style={{ height: '100vh', width: '100vw' }}
-      ref={mapContainerRef}
-      className='map-container'
-    />
-  );
+  return <div ref={mapContainerRef} className='map-container' />;
 };
 
 export default InteractiveMap;
