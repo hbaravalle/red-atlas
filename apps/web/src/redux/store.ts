@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
+import highlightReducer from './highlightSlice';
 import { propertiesApi } from './propertiesApi';
 import propertiesReducer from './propertiesSlice';
 
 export const store = configureStore({
   reducer: {
     properties: propertiesReducer,
+    highlight: highlightReducer,
     [propertiesApi.reducerPath]: propertiesApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

@@ -4,6 +4,7 @@ import {
   type Property,
   type SortOption,
 } from '@red-atlas/shared';
+import { highlight } from '../../redux/highlightSlice';
 import { useGetPropertiesQuery } from '../../redux/propertiesApi';
 import { setPage, setSort } from '../../redux/propertiesSlice';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
@@ -25,11 +26,14 @@ export default function PropertyList() {
   const properties = data?.properties ?? NO_PROPERTIES;
   const totalPages = data?.totalPages ?? 1;
 
+  // The cards unmount without a mouseleave, so clear the highlight here
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    dispatch(highlight(null));
     dispatch(setSort(event.target.value as SortOption));
   };
 
   const handlePageChange = (newPage: number) => {
+    dispatch(highlight(null));
     dispatch(setPage(newPage));
   };
 
@@ -75,6 +79,10 @@ export default function PropertyList() {
                 className='card'
                 to={`/detail/${property._id}`}
                 key={property._id}
+                onMouseEnter={() => dispatch(highlight(property._id))}
+                onMouseLeave={() => dispatch(highlight(null))}
+                onFocus={() => dispatch(highlight(property._id))}
+                onBlur={() => dispatch(highlight(null))}
               >
                 <figure>
                   <img src={property.images[0] || defaultImage} alt='' />

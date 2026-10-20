@@ -2,4 +2,57 @@
   width: 100vw;
   height: 100vh;
   background-color: #f2f2f2;
+
+  .maplibregl-marker {
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: none;
+    }
+
+    svg {
+      transform-origin: 50% 100%;
+      transition: transform 0.15s ease-out;
+
+      > g > g:nth-child(2) {
+        transition: fill 0.15s ease-out;
+      }
+    }
+
+    &.active,
+    &:hover,
+    &:focus-visible {
+      z-index: 1;
+
+      svg {
+        transform: scale(1.3);
+
+        > g > g:nth-child(2) {
+          fill: #000;
+        }
+      }
+    }
+  }
+}
+
+.pin-tooltip {
+  pointer-events: none;
+  max-width: 260px !important;
+
+  .maplibregl-popup-content {
+    padding: 10px 12px;
+    border-radius: 6px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 25px 0px;
+    font-family: 'Mulish';
+    font-size: 13px;
+    line-height: 1.4;
+    color: #6b6b6b;
+
+    .title {
+      margin-bottom: 2px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #000;
+    }
+  }
 }
